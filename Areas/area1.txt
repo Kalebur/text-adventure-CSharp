@@ -1,0 +1,100 @@
+ID: 1
+Name: The FILE-BASED Area
+Description: The first area created entirely using FILE READING! Isn't it AMAZING?!
+Room Count: 4
+Object Count: 1
+Actor Count: 3
+
+**OBJECT_LIST**
+--OBJECT--
+ID: 0
+Keywords: tables
+Short Description: one of the tables
+Long Description: A number of simple wooden tables are placed here for the tavern's patrons to eat at.
+Description: Dude! Tables are EVERYWHERE! This ROCKS!
+Weight: 50
+Wear Locations: BACK
+Object Flags: "canTake":false
+--END_OBJECT--
+**END_OBJECT_LIST**
+
+**ROOM_LIST**
+--ROOM--
+ID: 0
+Name: Tavern - "The First File"
+Description: It's a tavern, created from a file. How did I turn a piece of paper into a tavern, you might ask? Imagination, my friend. Imagination...
+
+**EXIT_LIST**
+--EXIT--
+Direction: East
+Connected Area ID: 0
+Connected Room ID: 1
+--END_EXIT--
+
+--EXIT--
+Direction: North
+Connected Area ID: 1
+Connected Room ID: 1
+--END_EXIT--
+
+--EXIT--
+Direction: West
+Connected Area ID: 1
+Connected Room ID: 2
+--END_EXIT--
+
+**END_EXIT_LIST**
+--END_ROOM--
+
+--ROOM--
+ID: 1
+Name: Dining Hall
+Description: Lots of tables for eating ALL the things! Also mugs of ale. Can't forget those.
+
+**EXIT_LIST**
+--EXIT--
+Direction: South
+Connected Area ID: 1
+Connected Room ID: 0
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+
+--ROOM--
+ID: 2
+Name: A Quiet Room
+Description: The bedrooms are away from all the hustle and bustle of the tavern proper, so they provide some peace and quiet for adventurers to relax and wind down after a hard day.
+
+**EXIT_LIST**
+--EXIT--
+Direction: East
+Connected Area ID: 1
+Connected Room ID: 0
+--END_EXIT--
+
+--EXIT--
+Direction: North
+Connected Area ID: 1
+Connected Room ID: 3
+--END_EXIT--
+
+
+**END_EXIT_LIST**
+--END_ROOM--
+
+--ROOM--
+ID: 3
+Name: A Luxurious Bathroom
+Description: The room is incredibly spacious for a tavern bathroom. A bath tub big enough for two or three people sits on the far side of the room. A small table with towels, wash cloths and soaps is by the door. The room even has a flushable toilet.
+
+**EXIT_LIST**
+--EXIT--
+Direction: South
+Connected Area ID: 1
+Connected Room ID: 2
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+**END_ROOM_LIST**
