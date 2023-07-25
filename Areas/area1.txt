@@ -1,12 +1,14 @@
 ID: 1
+Filename: area1.txt
 Name: The FILE-BASED Area
 Description: The first area created entirely using FILE READING! Isn't it AMAZING?!
 Room Count: 4
-Object Count: 1
+Object Count: 2
 Actor Count: 3
 
 **OBJECT_LIST**
 --OBJECT--
+Object Type: furniture
 ID: 0
 Keywords: tables
 Short Description: one of the tables
@@ -15,6 +17,23 @@ Description: Dude! Tables are EVERYWHERE! This ROCKS!
 Weight: 50
 Wear Locations: BACK
 Object Flags: "canTake":false
+--END_OBJECT--
+
+--OBJECT--
+Object Type: container
+ID: 1
+Keywords: jewelry,box
+Short Description: an intricate jewelry box
+Long Description: A jewelry box with many ornate designs around a central diamond.
+Description: The jewelry box is made of stained mahogany.
+Weight: 5
+Wear Locations: HELD
+Object Flags: "canTake":true
+Max Weight: 20
+Is Closable: true
+Is Closed: false
+Is Lockable: true
+Is Locked: false
 --END_OBJECT--
 **END_OBJECT_LIST**
 

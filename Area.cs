@@ -15,6 +15,7 @@ namespace TextAdventure
             get { return _id; }
             set { _id = value; }
         }
+        public string Filename { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
@@ -40,6 +41,7 @@ namespace TextAdventure
         public void DisplayArea()
         {
             Console.WriteLine("ID: " + ID);
+            Console.WriteLine("Filename: " + Filename);
             Console.WriteLine("Name: " + Name);
             Console.WriteLine("Description: " + Description);
             Console.WriteLine("---------");
@@ -52,7 +54,7 @@ namespace TextAdventure
             Console.WriteLine("Objects:");
             foreach (WorldObject obj in Objects)
             {
-                Console.WriteLine(obj.ID.ToString().PadLeft(5) + ": " + obj.LongDescription);
+                Console.WriteLine(obj.ID.ToString().PadLeft(5) + ": " + obj.ShortDescription);
             }
             Console.WriteLine("");
         }

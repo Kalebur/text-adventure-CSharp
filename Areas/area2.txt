@@ -1,4 +1,5 @@
 ID: 2
+Filename: area2.txt
 Name: FILE-BASED Area #2
 Description: The second area created entirely using FILE READING! Isn't it AMAZING?!
 Room Count: 4
@@ -7,6 +8,7 @@ Actor Count: 0
 
 **OBJECT_LIST**
 --OBJECT--
+Object Type: furniture
 ID: 0
 Keywords: bed
 Short Description: a luxurious bed

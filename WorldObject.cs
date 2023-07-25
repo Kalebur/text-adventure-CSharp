@@ -33,7 +33,7 @@ namespace TextAdventure
 
         public WorldObject()
         {
-            Keywords = new string[] { "woof", "meow", "bark" };
+            Keywords = new string[] { "object" };
             ShortDescription = "a new Object";
             LongDescription = "Some deity abandoned a newly created Object here.";
             Description = "BEHOLD! It's an Object!";

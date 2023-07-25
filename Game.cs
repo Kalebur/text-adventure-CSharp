@@ -30,6 +30,7 @@ namespace TextAdventure
             string[] splitCommand = command.ToLower().Split(' ');
             WorldObject targetObject;
             int targetIndex = -1;
+            string args = command.Substring(command.IndexOf(' ') + 1);
             switch (splitCommand[0]) {
                 case "quit":
                     isPlaying = false;
@@ -241,6 +242,8 @@ namespace TextAdventure
                         return;
                     }
                     targetObject = Game.areas[int.Parse(splitCommand[1])].Objects[int.Parse(splitCommand[2])];
+                    Console.WriteLine(targetObject.ShortDescription);
+                    Console.WriteLine(targetObject.GetType());
                     Console.Write("Can be worn on: ");
                     foreach (var loc in targetObject.WearLocations)
                     {
@@ -310,6 +313,10 @@ namespace TextAdventure
                             }
                         }
                     }
+                    break;
+
+                case "oinvoke":
+                    SpawnObject(Player, args);
                     break;
 
                 default:
@@ -430,11 +437,14 @@ namespace TextAdventure
 
             Container obj3 = new Container() { MaxWeight = 50f };
             obj3.ShortDescription = "a teddy bear";
+            obj3.LongDescription = "A big teddy bear is lying on the ground.";
             obj3.Description = "A huge teddy bear with big, brown eyes. There is a zipper on its back, and the stuffing has been removed.";
             obj3.ObjectFlags["canTake"] = true;
             obj3.WearLocations.Add(WorldObject.WearLocation.HELD);
             obj3.MaxWeight = 15f;
+            area.Objects.Add(obj3);
             obj3.ObjectToActor(Player);
+
 
         }
 
@@ -497,13 +507,12 @@ namespace TextAdventure
             return count;
         }
 
-        public static Area ParseRooms(Area area, ref string areaData)
+        public static void ParseRooms(Area area, ref string areaData)
         {
             for (int i = 0; i < area.Rooms.Count; i++)
             {
             ParseRoom(area, ref areaData);
             }
-            return area;
         }
 
         public static void ParseRoom(Area area, ref string areaData)
@@ -551,6 +560,54 @@ namespace TextAdventure
             }
         }
 
+        public static WorldObject ParseStandardObject(ref string objectData, string terminator)
+        {
+            WorldObject obj = new WorldObject();
+            int id = ParseID(ref objectData);
+            string[] keywords = ParseValue(ref objectData, "Keywords: ", terminator).Split(',');
+            TrimCurrentLine(ref objectData);
+            obj.Keywords = keywords;
+            string shortDescription = ParseValue(ref objectData, "Short Description: ", terminator);
+            TrimCurrentLine(ref objectData);
+            string longDescription = ParseValue(ref objectData, "Long Description: ", terminator);
+            TrimCurrentLine(ref objectData);
+            string description = ParseValue(ref objectData, "Description: ", terminator);
+            TrimCurrentLine(ref objectData);
+            float weight = float.Parse(ParseValue(ref objectData, "Weight: ", terminator));
+            TrimCurrentLine(ref objectData);
+
+            obj.ID = id;
+            obj.ShortDescription = shortDescription;
+            obj.LongDescription = longDescription;
+            obj.Description = description;
+            obj.Weight = weight;
+            return obj;
+        }
+
+        public static Container ParseContainer(WorldObject obj, ref string objectData, string terminator)
+        {
+            Container container = new Container();
+            container.ID = obj.ID;
+            container.Keywords = obj.Keywords;
+            container.ShortDescription = obj.ShortDescription;
+            container.LongDescription = obj.LongDescription;
+            container.Description = obj.Description;
+            container.Weight = obj.Weight;
+            container.MaxWeight = float.Parse(ParseValue(ref objectData, "Max Weight: ", terminator));
+            TrimCurrentLine(ref objectData);
+            container.IsClosable = bool.Parse(ParseValue(ref objectData, "Is Closable: ", terminator));
+            TrimCurrentLine(ref objectData);
+            container.IsClosed = bool.Parse(ParseValue(ref objectData, "Is Closed: ", terminator));
+            TrimCurrentLine(ref objectData);
+            container.IsLockable = bool.Parse(ParseValue(ref objectData, "Is Lockable: ", terminator));
+            TrimCurrentLine(ref objectData);
+            container.IsLocked = bool.Parse(ParseValue(ref objectData, "Is Locked: ", terminator));
+            TrimCurrentLine(ref objectData);
+
+
+            return container;
+        }
+
         public static void ParseObjects(Area area, ref string objectData)
         {
             objectData = objectData.Substring(objectData.IndexOf("**OBJECT_LIST**"));
@@ -560,29 +617,17 @@ namespace TextAdventure
 
             while (objectData.IndexOf(objectInitializer) != -1)
             {
-                WorldObject obj = new WorldObject();
                 int startIndex = objectData.IndexOf(objectInitializer);
                 int endIndex = objectData.IndexOf(objectTerminator) + objectTerminator.Length;
                 string currentObject = objectData.Substring(startIndex, endIndex - startIndex);
                 TrimCurrentLine(ref currentObject);
-                int id = ParseID(ref currentObject);
-                area.Objects[id].ID = id;
-                string[] keywords = ParseValue(ref currentObject, "Keywords: ", terminator).Split(',');
-                obj.Keywords = keywords;
-                TrimCurrentLine(ref currentObject);
-                obj.ShortDescription = ParseValue(ref currentObject, "Short Description: ", terminator);
-                TrimCurrentLine(ref currentObject);
-                obj.LongDescription = ParseValue(ref currentObject, "Long Description: ", terminator);
-                TrimCurrentLine(ref currentObject);
-                obj.Description = ParseValue(ref currentObject, "Description: ", terminator);
-                TrimCurrentLine(ref currentObject);
-                obj.Weight = float.Parse(ParseValue(ref currentObject, "Weight: ", terminator));
+                string objectType = ParseValue(ref currentObject, "Object Type: ", terminator);
                 TrimCurrentLine(ref currentObject);
 
+                WorldObject obj = ParseStandardObject(ref currentObject, terminator);
                 // Set object to be wearable on the assigned locations
                 string[] wearLocations = ParseValue(ref currentObject, "Wear Locations: ", terminator).Split(",");
                 var possibleLocations = Enum.GetValues(typeof(WorldObject.WearLocation));
-                WorldObject testObj = new WorldObject();
                 if (wearLocations[0] != "NONE")
                 {
                     foreach(var wornLocation in wearLocations)
@@ -596,8 +641,22 @@ namespace TextAdventure
                         }
                     }
                 }
+                TrimCurrentLine(ref currentObject);
+                // TODO: Remove the following line once object flags can be parsed
+                TrimCurrentLine(ref currentObject);
 
-                area.Objects[id] = obj;
+                if (objectType == "container")
+                {
+                    Container container = ParseContainer(obj, ref currentObject, terminator);
+                    area.Objects[container.ID] = container;
+                    container.ObjectToRoom(area.Rooms[0]);
+                    area.Objects[container.ID] = container;
+                } else
+                {
+                    area.Objects[obj.ID] = obj;
+
+                }
+
                 obj.ObjectToRoom(area.Rooms[1]);
                 objectData = objectData.Substring(endIndex);
 
@@ -619,6 +678,8 @@ namespace TextAdventure
             Area area = new Area();
             Game.areas.Add(area);
             area.ID = ParseID(ref areaData);
+            area.Filename = ParseValue(ref areaData, "Filename", "\n");
+            TrimCurrentLine(ref areaData);
             area.Name = ParseName(ref areaData);
             areaData = Area.TrimAreaData(areaData, "\n");
             area.Description = ParseDescription(ref areaData);
@@ -631,7 +692,24 @@ namespace TextAdventure
             areaData = Area.TrimAreaData(areaData, "\n");
             area.InitializeEntities();
             ParseObjects(area, ref areaData);
-            _ = ParseRooms(area, ref areaData);
+            ParseRooms(area, ref areaData);
+        }
+
+        public static void SpawnObject(Actor creator, string args)
+        {
+            string[] splitArgs = args.Split(' ');
+            if (splitArgs.Length < 2)
+            {
+                Console.WriteLine("Usage: oinvoke [areaID] [itemID]");
+                Console.WriteLine("Ex: oinvoke 2 0");
+                return;
+            }
+            int areaID = int.Parse(splitArgs[0]);
+            int itemID = int.Parse(splitArgs[1]);
+
+            WorldObject obj = areas[areaID].Objects[itemID];
+            obj.ObjectToActor(creator);
+            Console.WriteLine($"You reach into the ether and pull out {obj.ShortDescription}!");
         }
     }
 }
