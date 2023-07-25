@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -21,13 +22,14 @@ namespace TextAdventure
             set { _player = value; }
         }
 
-        private static List<Area> areas = new List<Area>();
+        private static readonly List<Area> areas = new();
 
 
         public static void ProcessCommand(string command)
         {
             string[] splitCommand = command.ToLower().Split(' ');
             WorldObject targetObject;
+            int targetIndex = -1;
             switch (splitCommand[0]) {
                 case "quit":
                     isPlaying = false;
@@ -124,7 +126,6 @@ namespace TextAdventure
                         targetObject.ObjectToActor(Player);
                         targetObject.ObjectFromRoom(Player.CurrentRoom);
                         Console.WriteLine($"You get {targetObject.ShortDescription}.");
-                        targetObject = null;
                     } else if (targetObject != null && !targetObject.ObjectFlags["canTake"])
                     {
                         Console.WriteLine("Sorry, you can't take that. Not EVERYTHING is just free for the taking, you know! Ugh, greedy adventurers...");
@@ -135,12 +136,12 @@ namespace TextAdventure
                     break;
 
                 case "drop":
-                    targetObject  = Player.IsCarrying(splitCommand[1]);
-                    if (targetObject != null)
+                    targetIndex = Player.IsCarrying(splitCommand[1]);
+                    if (targetIndex != -1)
                     {
-                        targetObject.ObjectFromActor(Player);
-                        targetObject.ObjectToRoom(Player.CurrentRoom);
-                        Console.WriteLine($"You drop {targetObject.ShortDescription}.");
+                        Player.Inventory[targetIndex].ObjectToRoom(Player.CurrentRoom);
+                        Console.WriteLine($"You drop {Player.Inventory[targetIndex].ShortDescription}.");
+                        Player.Inventory[targetIndex].ObjectFromActor(Player);
                     } else
                     {
                         Console.WriteLine("You aren't carrying that.");
@@ -148,14 +149,15 @@ namespace TextAdventure
                     break;
 
                 case "wear":
-                    targetObject = Player.IsCarrying(splitCommand[1]);
-                    if (targetObject != null && targetObject.WearLocations.Count > 0)
+                    targetIndex = Player.IsCarrying(splitCommand[1]);
+                    var obj = Player.Inventory[targetIndex];
+                    if (obj != null && obj.WearLocations.Count > 0)
                     {
-                        foreach (var loc in targetObject.WearLocations)
+                        foreach (var loc in obj.WearLocations)
                         {
                             if (loc.ToString() == "HELD")
                             {
-                                if (targetObject.WearLocations.Contains(WorldObject.WearLocation.WIELD_DUAL))
+                                if (obj.WearLocations.Contains(WorldObject.WearLocation.WIELD_DUAL))
                                 {
                                     if (Player.Equipment[WorldObject.WearLocation.WIELD_R] != null ||
                                         Player.Equipment[WorldObject.WearLocation.WIELD_L] != null) {
@@ -164,15 +166,15 @@ namespace TextAdventure
                                 }
                                 if (Player.Equipment[WorldObject.WearLocation.WIELD_R] == null)
                                 {
-                                    Player.Equipment[WorldObject.WearLocation.WIELD_R] = targetObject;
-                                    Console.WriteLine($"You wield {targetObject.ShortDescription} in your right hand.");
-                                    targetObject.ObjectFromActor(Player);
+                                    Player.Equipment[WorldObject.WearLocation.WIELD_R] = obj;
+                                    Console.WriteLine($"You wield {obj.ShortDescription} in your right hand.");
+                                    obj.ObjectFromActor(Player);
                                     return;
                                 } else if (Player.Equipment[WorldObject.WearLocation.WIELD_L] == null)
                                 {
-                                    Player.Equipment[WorldObject.WearLocation.WIELD_L] = targetObject;
-                                    Console.WriteLine($"You wield {targetObject.ShortDescription} in your left hand.");
-                                    targetObject.ObjectFromActor(Player);
+                                    Player.Equipment[WorldObject.WearLocation.WIELD_L] = obj;
+                                    Console.WriteLine($"You wield {obj.ShortDescription} in your left hand.");
+                                    obj.ObjectFromActor(Player);
                                     return;
                                 } else
                                 {
@@ -183,11 +185,11 @@ namespace TextAdventure
                             {
                                 if (Player.Equipment[loc] == null)
                                 {
-                                    Player.Equipment[loc] = targetObject;
-                                    targetObject.ObjectFromActor (Player);
-                                    Console.WriteLine($"You wear {targetObject.ShortDescription} on your {loc.ToString().ToLower()}.");
+                                    Player.Equipment[loc] = obj;
+                                    obj.ObjectFromActor (Player);
+                                    Console.WriteLine($"You wear {obj.ShortDescription} on your {loc.ToString().ToLower()}.");
                                     return;
-                                } else if (Player.Equipment[loc] != null && targetObject.WearLocations.Count == 1)
+                                } else if (Player.Equipment[loc] != null && obj.WearLocations.Count == 1)
                                 {
                                     Console.WriteLine($"You're already wearing something on your {loc.ToString().ToLower()}! You might wanna take that off first.");
                                     return;
@@ -196,9 +198,8 @@ namespace TextAdventure
                                     continue;
                                 }
                             }
-                            break;
                         }
-                    } else if (targetObject != null && targetObject.WearLocations.Count == 0)
+                    } else if (obj != null && obj.WearLocations.Count == 0)
                     {
                         Console.WriteLine("You can't figure out how to wear that.");
                     } else
@@ -249,10 +250,65 @@ namespace TextAdventure
 
                 case "exa":
                 case "examine":
-                    targetObject = Player.IsCarrying(splitCommand[1]);
-                    if (targetObject != null)
                     {
-                        targetObject.DisplayObjectInfo();
+                        Player.ExamineObject(splitCommand[1]);
+                        break;
+                    }
+
+                case "put":
+                    if (splitCommand.Length < 3)
+                    {
+                        Console.WriteLine("Put WHAT WHERE?!");
+                        return;
+                    } else
+                    {
+                        string itemToStore = splitCommand[1];
+                        string targetContainer = splitCommand[2];
+                        targetIndex = Player.IsCarrying(itemToStore);
+                        int containerIndex = -1;
+                        Container container;
+
+                        // If player isn't carrying target item
+                        if (targetIndex == -1)
+                        {
+                            Console.WriteLine("You aren't carrying that.");
+                        } else if (targetIndex != -1) // If player IS carrying target item
+                        {
+                            // Check if player is carrying target container
+                            containerIndex = Player.IsCarrying(targetContainer);
+                            if (containerIndex == -1)
+                            {
+                                // If player isn't carrying target container, check to see if
+                                // the container is an object in the room
+                                container = (Container)Player.CurrentRoom.ObjectInRoom(targetContainer);
+                                if (container == null)
+                                {
+                                    Console.WriteLine("There's nothing like that here.");
+                                    return;
+                                } else
+                                {
+                                    container.ObjectToContainer(Player.Inventory[targetIndex]);
+                                }
+                            } 
+
+                            else
+                            {
+                                // Player is carrying both target item and target container
+                                if (itemToStore == targetContainer)
+                                {
+                                    // Prevent player from putting a container inside itself.
+                                    Console.WriteLine("You can't put containers in themselves! Are you TRYING to destroy the universe?!");
+                                    return;
+                                }
+                                else
+                                {
+                                    // Player has both items and isn't trying to create a paradox
+                                    // Store item in container and stored item from player's inventory
+                                    container = (Container)Player.Inventory[containerIndex];
+                                    container.ObjectToContainer(Player.Inventory[targetIndex]);
+                                }
+                            }
+                        }
                     }
                     break;
 
@@ -269,6 +325,8 @@ namespace TextAdventure
             Console.Write("> ");
         }
 
+        // TODO: Most of this is hardcoded game data and needs to be removed once full file parsing
+        // functionality is implemented.
         public static void InitializeGame()
         {
             Area area = new Area();
@@ -372,11 +430,10 @@ namespace TextAdventure
 
             Container obj3 = new Container() { MaxWeight = 50f };
             obj3.ShortDescription = "a teddy bear";
-            obj3.Description = "A huge teddy bear with big, brown eyes. There is a zipper on its back, and it appears the stuffing has been removed to allow items to be placed inside.";
+            obj3.Description = "A huge teddy bear with big, brown eyes. There is a zipper on its back, and the stuffing has been removed.";
             obj3.ObjectFlags["canTake"] = true;
             obj3.WearLocations.Add(WorldObject.WearLocation.HELD);
             obj3.MaxWeight = 15f;
-            obj3.DisplayObjectInfo();
             obj3.ObjectToActor(Player);
 
         }

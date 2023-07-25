@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,15 +44,19 @@ namespace TextAdventure
             {
                 Console.WriteLine($"There isn't enough room to put that in {ShortDescription}.");
                 return;
-            } else
+            } else if (IsClosed)
+            {
+                Console.WriteLine($"The container is closed.");
+            }
             {
                 _currentWeight += item.Weight;
                 ContainedItems.Add(item);
                 item.ObjectFromActor(Game.Player);
+                Console.WriteLine($"You put {item.ShortDescription} in {ShortDescription}.");
             }
         }
 
-        public new void DisplayObjectInfo()
+        public override void DisplayObjectInfo()
         {
             string padding = "".PadLeft(12);
             Console.WriteLine(Description);
@@ -65,9 +71,9 @@ namespace TextAdventure
                 return;
             } else
             {
-                foreach ( WorldObject item in ContainedItems )
+                foreach ( var item in ContainedItems )
                 {
-                    Console.WriteLine($"{padding}{ShortDescription}");
+                    Console.WriteLine($"{padding}{item.ShortDescription}");
                 }
             }
         }

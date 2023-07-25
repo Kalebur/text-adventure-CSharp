@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -138,5 +139,12 @@ namespace TextAdventure
             }
             return null;
         }
+
+        public bool ObjectInRoom(WorldObject obj)
+        {
+            if (!objectsInRoom.Contains(obj)) return false;
+            return true;
+        }
+
     }
 }

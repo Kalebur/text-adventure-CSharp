@@ -38,7 +38,7 @@ namespace TextAdventure
             LongDescription = "Some deity abandoned a newly created Object here.";
             Description = "BEHOLD! It's an Object!";
             Weight = 2f;
-            ObjectFlags.Add("canTake", false);
+            ObjectFlags.Add("canTake", true);
             WearLocations = new List<WearLocation>();
         }
 
@@ -62,11 +62,23 @@ namespace TextAdventure
             actor.Inventory.Remove(this);
         }
 
-        public void DisplayObjectInfo()
+        public virtual void DisplayObjectInfo()
         {
             Console.WriteLine(Description);
         }
 
+        public static int GetItemIndex(List<WorldObject> objects, string targetItem)
+        {
+            for (int i = 0; i < objects.Count; i++)
+            {
+                if (objects[i].ShortDescription.Contains(targetItem.ToLower()))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
 
     }
 }

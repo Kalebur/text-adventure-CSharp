@@ -155,16 +155,29 @@ namespace TextAdventure
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
-        public WorldObject? IsCarrying(string targetObject)
+        public int IsCarrying(string targetObject)
         {
-            foreach (var item in Inventory)
+            for (int i = 0; i < Inventory.Count; i++)
             {
-                if (item.ShortDescription.ToLower().Contains(targetObject.ToLower()) || item.Keywords.Contains(targetObject.ToLower())) {
-                    return item;
+                if (Inventory[i].ShortDescription.ToLower().Contains(targetObject.ToLower())
+                    || Inventory[i].Keywords.Contains(targetObject.ToLower())) {
+                    return i;
                 }
             }
 
-            return null;
+            return -1;
+        }
+
+        public void ExamineObject(string targetObject)
+        {
+            int itemIndex = IsCarrying(targetObject);
+            if (itemIndex != -1)
+            {
+                Inventory[itemIndex].DisplayObjectInfo();
+            } else
+            {
+                Console.WriteLine("You aren't carrying that.");
+            }
         }
     }
 }
