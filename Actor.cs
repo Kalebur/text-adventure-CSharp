@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -177,6 +178,61 @@ namespace TextAdventure
             } else
             {
                 Console.WriteLine("You aren't carrying that.");
+            }
+        }
+
+        public void DoGet(string args)
+        {
+            if (args == "get")
+            {
+                Console.WriteLine("Get what, exactly?");
+                return;
+            }
+            string[] splitArgs = args.Split(' ');
+            
+
+            // If args is only two items, get object from current room
+            if (splitArgs.Length == 1)
+            {
+                string objToGet = splitArgs[0];
+                WorldObject? targetObject = CurrentRoom.ObjectInRoom(objToGet);
+
+                if (targetObject != null && targetObject.ObjectFlags["canTake"])
+                {
+                    targetObject.ObjectToActor(this);
+                    targetObject.ObjectFromRoom(this.CurrentRoom);
+                    Console.WriteLine($"You get {targetObject.ShortDescription}.");
+                }
+                else if (targetObject != null && !targetObject.ObjectFlags["canTake"])
+                {
+                    Console.WriteLine("Sorry, you can't take that. Not EVERYTHING is just free for the taking, you know! Ugh, greedy adventurers...");
+                }
+                else
+                {
+                    Console.WriteLine("You don't see anything like that here.");
+                }
+            }
+            // If args is two+ items, try to take something from a container
+            else
+            {
+                string objToTake = splitArgs[0].ToLower();
+                string targetContainer = splitArgs[1].ToLower();
+                string itemNotFoundMessage = "There's nothing like that in ";
+                // First, check if the container is something the player is carrying
+                int objIndex = IsCarrying(targetContainer);
+                if (objIndex != -1) {
+                    Container c = (Container)Inventory[objIndex];
+                    c.ObjectFromContainer(objToTake, itemNotFoundMessage, this);
+                } else if (objIndex == -1)
+                {
+                    // Player isn't carrying the container, so look for it in the room they're in
+                    var roomContainer = (Container)CurrentRoom.ObjectInRoom(targetContainer);
+                    if (roomContainer != null)
+                    {
+                        roomContainer.ObjectFromContainer(objToTake, itemNotFoundMessage, this);
+                    }
+                    
+                }
             }
         }
     }

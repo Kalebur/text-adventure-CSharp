@@ -31,7 +31,7 @@ Wear Locations: HELD
 Object Flags: "canTake":true
 Max Weight: 20
 Is Closable: true
-Is Closed: false
+Is Closed: true
 Is Lockable: true
 Is Locked: false
 --END_OBJECT--

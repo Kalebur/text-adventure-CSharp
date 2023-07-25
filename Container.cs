@@ -38,6 +38,11 @@ namespace TextAdventure
             CloseAction = "close";
         }
 
+        private void PrintClosedMessage()
+        {
+            Console.WriteLine($"{ShortDescription[0].ToString().ToUpper() + ShortDescription[1..]} is closed.");
+        }
+
         public void ObjectToContainer(WorldObject item)
         {
             if (item.Weight + _currentWeight > MaxWeight)
@@ -46,7 +51,8 @@ namespace TextAdventure
                 return;
             } else if (IsClosed)
             {
-                Console.WriteLine($"The container is closed.");
+                PrintClosedMessage();
+                return;
             }
             {
                 _currentWeight += item.Weight;
@@ -54,6 +60,39 @@ namespace TextAdventure
                 item.ObjectFromActor(Game.Player);
                 Console.WriteLine($"You put {item.ShortDescription} in {ShortDescription}.");
             }
+        }
+
+        public void ObjectFromContainer(string objToTake, string itemNotFoundMessage, Actor receiver)
+        {
+            if (IsClosed)
+            {
+                PrintClosedMessage();
+                return;
+            }
+            if (ContainerHasItem(objToTake, out WorldObject item))
+            {
+                Console.WriteLine($"You take {item.ShortDescription} out of {ShortDescription}.");
+                item.ObjectToActor(receiver);
+                ContainedItems.Remove(item);
+            }
+            else
+            {
+                Console.WriteLine($"{itemNotFoundMessage}{ShortDescription}.");
+            }
+        }
+
+        public bool ContainerHasItem(string targetItem, out WorldObject i)
+        {
+            foreach (var item in ContainedItems)
+            {
+                if (item.ShortDescription.ToLower().Contains(targetItem.ToLower() ))
+                {
+                    i = item;
+                    return true;
+                }
+            }
+            i = null;
+            return false;
         }
 
         public override void DisplayObjectInfo()
@@ -64,16 +103,18 @@ namespace TextAdventure
             if (IsClosed)
             {
                 Console.WriteLine($"{ShortDescription} is closed.");
-            }
-            Console.WriteLine($"{ShortDescription} contains:");
-            if (ContainedItems.Count == 0) {
-                Console.WriteLine($"{padding}Nothing");
-                return;
             } else
             {
-                foreach ( var item in ContainedItems )
+                Console.WriteLine($"{ShortDescription} contains:");
+                if (ContainedItems.Count == 0) {
+                    Console.WriteLine($"{padding}Nothing");
+                    return;
+                } else
                 {
-                    Console.WriteLine($"{padding}{item.ShortDescription}");
+                    foreach ( var item in ContainedItems )
+                    {
+                        Console.WriteLine($"{padding}{item.ShortDescription}");
+                    }
                 }
             }
         }

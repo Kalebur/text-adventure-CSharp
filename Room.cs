@@ -131,6 +131,11 @@ namespace TextAdventure
             return ex;
         }
 
+        /// <summary>
+        /// Checks to see if an object with a name that includes the param targetObj is in the room.
+        /// </summary>
+        /// <param name="targetObj"></param>
+        /// <returns>The object if found, null if not found.</returns>
         public WorldObject? ObjectInRoom(string targetObj)
         {
             foreach (var obj in objectsInRoom)

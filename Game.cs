@@ -30,7 +30,7 @@ namespace TextAdventure
             string[] splitCommand = command.ToLower().Split(' ');
             WorldObject targetObject;
             int targetIndex = -1;
-            string args = command.Substring(command.IndexOf(' ') + 1);
+            string args = command[(command.IndexOf(' ') + 1)..];
             switch (splitCommand[0]) {
                 case "quit":
                     isPlaying = false;
@@ -120,23 +120,15 @@ namespace TextAdventure
                     break;
 
                 case "get":
-                    targetObject = Player.CurrentRoom.ObjectInRoom(splitCommand[1]);
-
-                    if (targetObject != null && targetObject.ObjectFlags["canTake"])
-                    {
-                        targetObject.ObjectToActor(Player);
-                        targetObject.ObjectFromRoom(Player.CurrentRoom);
-                        Console.WriteLine($"You get {targetObject.ShortDescription}.");
-                    } else if (targetObject != null && !targetObject.ObjectFlags["canTake"])
-                    {
-                        Console.WriteLine("Sorry, you can't take that. Not EVERYTHING is just free for the taking, you know! Ugh, greedy adventurers...");
-                    } else
-                    {
-                        Console.WriteLine("You don't see anything like that here.");
-                    }
+                    Player.DoGet(args);
                     break;
 
                 case "drop":
+                    if (splitCommand.Length == 1)
+                    {
+                        Console.WriteLine("Drop what?");
+                        break;
+                    }
                     targetIndex = Player.IsCarrying(splitCommand[1]);
                     if (targetIndex != -1)
                     {
@@ -150,6 +142,11 @@ namespace TextAdventure
                     break;
 
                 case "wear":
+                    if (splitCommand.Length == 1)
+                    {
+                        Console.WriteLine("Wear WHAT?!");
+                        break;
+                    }
                     targetIndex = Player.IsCarrying(splitCommand[1]);
                     var obj = Player.Inventory[targetIndex];
                     if (obj != null && obj.WearLocations.Count > 0)
@@ -211,6 +208,11 @@ namespace TextAdventure
 
                 case "remove":
                 case "rem":
+                    if (splitCommand.Length == 1)
+                    {
+                        Console.WriteLine("Remove WHAT?!");
+                        break;
+                    }
                     string objToRemove = splitCommand[1];
                     foreach(var wornItem in Player.Equipment)
                     {
@@ -247,13 +249,18 @@ namespace TextAdventure
                     Console.Write("Can be worn on: ");
                     foreach (var loc in targetObject.WearLocations)
                     {
-                        Console.Write($"{loc.ToString()},");
+                        Console.Write($"{loc},");
                     }
                     break;
 
                 case "exa":
                 case "examine":
                     {
+                        if (splitCommand.Length == 1)
+                        {
+                            Console.WriteLine("Examining imaginary objects again?");
+                            break;
+                        }
                         Player.ExamineObject(splitCommand[1]);
                         break;
                     }
@@ -472,7 +479,7 @@ namespace TextAdventure
 
         public static void TrimCurrentLine(ref string stringToTrim)
         {
-            stringToTrim = stringToTrim.Substring(stringToTrim.IndexOf("\n") + 1);
+            stringToTrim = stringToTrim[(stringToTrim.IndexOf("\n") + 1)..];
         }
 
         // Returns the value substring between identifier and terminator
@@ -487,7 +494,7 @@ namespace TextAdventure
         public static int ParseID(ref string areaData)
         {
             _ = int.TryParse(ParseValue(ref areaData, "ID: ", "\n"), out int id);
-            areaData = areaData.Substring(areaData.IndexOf("\n") + 1);
+            areaData = areaData[(areaData.IndexOf("\n") + 1)..];
             return id;
         }
 
@@ -522,7 +529,7 @@ namespace TextAdventure
             string trimmedData = areaData.Substring(areaData.IndexOf(dividerText));
             trimmedData = trimmedData.Substring(trimmedData.IndexOf("\n") + 1);
             int dataSize = trimmedData.IndexOf(terminator) + terminator.Length;
-            string roomData = trimmedData.Substring(0, dataSize);
+            string roomData = trimmedData[..dataSize];
 
             int roomID = ParseID(ref roomData);
             string roomName = ParseName(ref roomData);
