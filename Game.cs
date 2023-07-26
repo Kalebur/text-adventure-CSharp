@@ -343,7 +343,7 @@ namespace TextAdventure
 
         public static void DisplayPrompt()
         {
-            Console.WriteLine($"\nHP: {Player.CurrentHP}/{Player.MaxHP} Gold: {Player.Gold}");
+            Console.WriteLine($"\nHP: {Player.CurrentHP}/{Player.MaxHP} MP:{Player.CurrentMP}/{Player.MaxMP} Gold: {Player.Gold}");
             Console.Write("> ");
         }
 
