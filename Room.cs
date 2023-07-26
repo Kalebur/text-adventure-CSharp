@@ -16,21 +16,13 @@ namespace TextAdventure
 
         public List<Actor> actorsInRoom;
         public List<WorldObject> objectsInRoom;
-        private int _areaID;
-
-        public int? AreaID
-        {
-            get { return _areaID; }
-#pragma warning disable CS8629 // Nullable value type may be null.
-            set => _areaID = (int)value;
-#pragma warning restore CS8629 // Nullable value type may be null.
-        }
+        public int AreaID { get; set; }
 
         public int ID { get; set; }
 
 
         //public Dictionary<string, RoomExit> Exits { get; } = new Dictionary<string, RoomExit>();
-        public List<RoomExit> Exits { get; set; } = new List<RoomExit>();
+        public List<RoomExit> Exits { get; } = new List<RoomExit>();
 
         public void DisplayExits()
         {

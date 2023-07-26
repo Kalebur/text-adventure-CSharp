@@ -95,6 +95,12 @@ namespace TextAdventure
             return false;
         }
 
+        public static bool IsContainer(dynamic obj)
+        {
+            if (obj.GetType() != typeof(Container)) return false;
+            return true;
+        }
+
         public override void DisplayObjectInfo()
         {
             string padding = "".PadLeft(12);

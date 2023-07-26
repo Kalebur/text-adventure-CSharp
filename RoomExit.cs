@@ -10,7 +10,7 @@ namespace TextAdventure
     {
         public enum ExitDirection { NORTH, SOUTH, WEST, EAST, UP, DOWN, NORTHEAST, SOUTHEAST, NORTHWEST, SOUTHWEST, CUSTOM }
 
-        private ExitDirection _direction;
+        private readonly ExitDirection _direction;
         private string _directionName;
 
         public string Direction
@@ -42,6 +42,9 @@ namespace TextAdventure
         {
             _direction = ExitDirection.NORTH;
             _directionName = "Somewhere";
+            Description = "the door";
+            ConnectedRoom = new Room();
+
         }
 
         public RoomExit(string direction)
@@ -99,6 +102,10 @@ namespace TextAdventure
                     _directionName = "Somewhere";
                     break;
             }
+
+            _directionName = "Somewhere...";
+            Description = _directionName;
+            ConnectedRoom = new Room();
         }
     }
 }

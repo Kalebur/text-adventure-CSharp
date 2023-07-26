@@ -35,6 +35,7 @@ namespace TextAdventure
 
         public bool InCombat { get; set; }
         public bool IsPlayer { get; set; }
+        public bool IsAsleep { get; set; }
         public Room CurrentRoom { get; set; }
         public List<WorldObject> Inventory { get; set; } = new List<WorldObject>();
         public Dictionary<WorldObject.WearLocation, WorldObject?> Equipment { get; set; } = new Dictionary<WorldObject.WearLocation, WorldObject?>();
@@ -82,6 +83,7 @@ namespace TextAdventure
             Equipment.Add(WorldObject.WearLocation.OVER, null);
         }
 
+
         public void MoveActor(string direction)
         {
             if (InCombat)
@@ -115,6 +117,10 @@ namespace TextAdventure
             room.actorsInRoom.Add(this);
         }
 
+        /// <summary>
+        /// Shows the list of everything the player currently has equipped.
+        /// Empty slots will show up as "Nothing."
+        /// </summary>
         public void ShowEquipment()
         {
             bool allEmpty = true;
@@ -167,6 +173,24 @@ namespace TextAdventure
             }
 
             return -1;
+        }
+
+        public bool IsCarrying(string targetObject, out WorldObject carriedItem)
+        {
+            foreach (var item in Inventory)
+            {
+                if (item.ShortDescription.ToLower().Contains(targetObject.ToLower()) ||
+                    item.Keywords.Contains(targetObject.ToLower()))
+                {
+                    carriedItem = item;
+                    return true;
+                }
+            }
+
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            carriedItem = null;
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+            return false;
         }
 
         public void ExamineObject(string targetObject)
@@ -230,6 +254,13 @@ namespace TextAdventure
                     if (roomContainer != null)
                     {
                         roomContainer.ObjectFromContainer(objToTake, itemNotFoundMessage, this);
+                    } else if (roomContainer != null && !Container.IsContainer(roomContainer))
+                    {
+                        Console.WriteLine("That's not a container!");
+                    } else
+                    {
+                        Console.WriteLine("There's nothing like that here.");
+                        return;
                     }
                     
                 }

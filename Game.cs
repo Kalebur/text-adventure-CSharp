@@ -29,7 +29,7 @@ namespace TextAdventure
         {
             string[] splitCommand = command.ToLower().Split(' ');
             WorldObject targetObject;
-            int targetIndex = -1;
+            int targetIndex;
             string args = command[(command.IndexOf(' ') + 1)..];
             switch (splitCommand[0]) {
                 case "quit":
@@ -106,7 +106,7 @@ namespace TextAdventure
                     break;
 
                 case "astat":
-                    areas[(int)Player.CurrentRoom.AreaID].DisplayArea();
+                    areas[Player.CurrentRoom.AreaID].DisplayArea();
                     break;
 
                 case "inv":
@@ -275,7 +275,7 @@ namespace TextAdventure
                         string itemToStore = splitCommand[1];
                         string targetContainer = splitCommand[2];
                         targetIndex = Player.IsCarrying(itemToStore);
-                        int containerIndex = -1;
+                        int containerIndex;
                         Container container;
 
                         // If player isn't carrying target item
@@ -295,6 +295,10 @@ namespace TextAdventure
                                 {
                                     Console.WriteLine("There's nothing like that here.");
                                     return;
+                                } else if (!Container.IsContainer(container))
+                                {
+                                    Console.WriteLine("That's not a container.");
+                                    return;
                                 } else
                                 {
                                     container.ObjectToContainer(Player.Inventory[targetIndex]);
@@ -310,7 +314,11 @@ namespace TextAdventure
                                     Console.WriteLine("You can't put containers in themselves! Are you TRYING to destroy the universe?!");
                                     return;
                                 }
-                                else
+                                else if (!Container.IsContainer(Player.Inventory[containerIndex]))
+                                {
+                                    Console.WriteLine("That's not a container.");
+                                    return;
+                                }
                                 {
                                     // Player has both items and isn't trying to create a paradox
                                     // Store item in container and stored item from player's inventory
@@ -452,6 +460,11 @@ namespace TextAdventure
             area.Objects.Add(obj3);
             obj3.ObjectToActor(Player);
 
+            if (Player.IsCarrying("bear", out WorldObject @object))
+            {
+
+                Console.WriteLine($"You're carrying {@object.ShortDescription}, which is a {@object.GetType()}!");
+            }
 
         }
 

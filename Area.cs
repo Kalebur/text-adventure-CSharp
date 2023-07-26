@@ -30,6 +30,7 @@ namespace TextAdventure
         public List<WorldObject> Objects { get; set; } = new List<WorldObject>();
 
         public Area() {
+            Filename = string.Empty;
             ID = 0;
             Name = "A Brand New Area";
             Description = "This is a new area. In fact, it still has that 'new area' smell!";
