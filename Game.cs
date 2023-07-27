@@ -132,7 +132,8 @@ namespace TextAdventure
                                 {
                                     if (Player.Equipment[WorldObject.WearLocation.WIELD_R] != null ||
                                         Player.Equipment[WorldObject.WearLocation.WIELD_L] != null) {
-
+                                        Console.WriteLine("You need both hands free to wield that!");
+                                        return;
                                     }
                                 }
                                 if (Player.Equipment[WorldObject.WearLocation.WIELD_R] == null)
@@ -181,24 +182,7 @@ namespace TextAdventure
 
                 case "remove":
                 case "rem":
-                    if (splitCommand.Length == 1)
-                    {
-                        Console.WriteLine("Remove WHAT?!");
-                        break;
-                    }
-                    string objToRemove = splitCommand[1];
-                    foreach(var wornItem in Player.Equipment)
-                    {
-                        if (wornItem.Value != null && 
-                            (wornItem.Value.Keywords.Contains(objToRemove) || wornItem.Value.ShortDescription.Contains(objToRemove)))
-                        {
-                            wornItem.Value.ObjectToActor(Player);
-                            Player.Equipment[wornItem.Key] = null;
-                            Console.WriteLine($"You remove {wornItem.Value.ShortDescription}.");
-                            return;
-                        }
-                    }
-                    Console.WriteLine("You're not wearing that.");
+                    Player.DoRemove(args);
                     break;
 
                 case "alist":
@@ -206,7 +190,7 @@ namespace TextAdventure
                     break;
 
                 case "ostat":
-                    Player.DoOstat(args);
+                    Actor.DoOstat(args);
                     break;
 
                 case "exa":
@@ -563,6 +547,7 @@ namespace TextAdventure
             container.ShortDescription = obj.ShortDescription;
             container.LongDescription = obj.LongDescription;
             container.Description = obj.Description;
+            container.ObjectFlags = obj.ObjectFlags;
             container.Weight = obj.Weight;
             container.MaxWeight = float.Parse(ParseValue(ref objectData, "Max Weight: ", terminator));
             TrimCurrentLine(ref objectData);
@@ -581,7 +566,7 @@ namespace TextAdventure
 
         public static void ParseObjects(Area area, ref string objectData)
         {
-            objectData = objectData.Substring(objectData.IndexOf("**OBJECT_LIST**"));
+            objectData = objectData[objectData.IndexOf("**OBJECT_LIST**")..];
             string objectInitializer = "--OBJECT--";
             string terminator = "\n";
             string objectTerminator = "--END_OBJECT--\r\n";
@@ -614,6 +599,8 @@ namespace TextAdventure
                 }
                 TrimCurrentLine(ref currentObject);
                 // TODO: Remove the following line once object flags can be parsed
+                string[] objectFlags = ParseValue(ref currentObject, "Object Flags: ", terminator).Split(',');
+                ParseObjectFlags(obj, objectFlags);
                 TrimCurrentLine(ref currentObject);
 
                 if (objectType == "container")
@@ -704,8 +691,24 @@ namespace TextAdventure
             Console.BackgroundColor = defaultBackgroundColor;
         }
 
+        public static void ParseObjectFlags(WorldObject obj, string[] flags)
+        {
+            foreach(var flag in flags)
+            {
+                string[] flagData= flag.Split(':');
+                string keyVal = flagData[0].Substring(1, flagData[0].Length - 2);
+                _ = bool.TryParse(flagData[1], out bool flagValue);
+                obj.ObjectFlags.TryAdd(keyVal, flagValue);
+            }
+        }
+
         public static void PrintCommaSeparatedList(dynamic list)
         {
+            if (list.Count == 0)
+            {
+                Console.WriteLine();
+                return;
+            }
             for (int i = 0; i <  list.Count; i++)
             {
                 if (i < list.Count - 1)

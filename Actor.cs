@@ -348,7 +348,7 @@ namespace TextAdventure
             }
         }
 
-        public void DoOstat(string args)
+        public static void DoOstat(string args)
         {
             string[] splitArgs = args.Split(' ');
             try
@@ -371,6 +371,30 @@ namespace TextAdventure
                 Console.WriteLine("Usage: ostat AREA_ID OBJECT_ID");
                 Console.WriteLine("Ex: ostat 0 2");
                 return;
+            }
+        }
+
+        public void DoRemove(string args)
+        {
+            if (args == "rem" || args == "remove")
+            {
+                Console.WriteLine("Remove WHAT?!");
+                return;
+            }
+            else
+            {
+                foreach (var wornItem in Equipment)
+                {
+                    if (wornItem.Value != null &&
+                        (wornItem.Value.Keywords.Contains(args) || wornItem.Value.ShortDescription.Contains(args)))
+                    {
+                        wornItem.Value.ObjectToActor(this);
+                        Equipment[wornItem.Key] = null;
+                        Console.WriteLine($"You remove {wornItem.Value.ShortDescription}.");
+                        return;
+                    }
+                }
+                Console.WriteLine("You're not wearing that.");
             }
         }
     }

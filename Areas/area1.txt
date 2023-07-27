@@ -28,7 +28,7 @@ Long Description: A jewelry box with many ornate designs around a central diamon
 Description: The jewelry box is made of stained mahogany.
 Weight: 5
 Wear Locations: HELD
-Object Flags: "canTake":true
+Object Flags: "canTake":true,"isClosable":true,"isClosed":true,"isLockable":true,"isLocked":false
 Max Weight: 20
 Is Closable: true
 Is Closed: true
