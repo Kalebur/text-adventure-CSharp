@@ -17,6 +17,7 @@ namespace TextAdventure
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static readonly string UniversalPadding = "".PadLeft(5);
+        public static readonly string GlobalLineTerminator = "\n";
 
         public static Actor Player
         {
@@ -396,11 +397,7 @@ namespace TextAdventure
             area.Objects.Add(obj3);
             obj3.ObjectToActor(Player);
 
-            if (Player.IsCarrying("bear", out WorldObject @object))
-            {
-
-                Console.WriteLine($"You're carrying {@object.ShortDescription}, which is a {@object.GetType()}!");
-            }
+            room5.AddExit("North", areas[3].Rooms[0]);
 
         }
 
@@ -423,6 +420,17 @@ namespace TextAdventure
             foreach (var file in fileList)
             {
                 ParseAreaFile(file);
+            }
+
+            string areaData;
+            foreach (var file in fileList)
+            {
+                areaData = File.ReadAllText(file);
+                int areaID = ParseID(ref areaData);
+
+                ParseObjects(areas[areaID], ref areaData);
+                ParseActors(areas[areaID], ref areaData);
+                ParseRooms(areas[areaID], ref areaData);
             }
         }
 
@@ -491,6 +499,59 @@ namespace TextAdventure
             area.Rooms[roomID].ID = roomID;
             area.Rooms[roomID].Name = roomName;
             area.Rooms[roomID].Description = roomDescription;
+        }
+
+        public static void ParseActors(Area area, ref string areaData)
+        {
+            string actorList = areaData[areaData.IndexOf("**ACTOR_LIST**")..];
+            string actorInitializer = "--ACTOR--";
+            string actorTerminator = "--END_ACTOR--\r\n";
+
+            while (actorList.IndexOf(actorInitializer) != -1)
+            {
+                string currentActor = actorList[actorList.IndexOf(actorInitializer)..];
+                TrimCurrentLine(ref currentActor);
+                Actor actor = new Actor();
+                actor.ID = ParseID(ref currentActor);
+                actor.Name = ParseValue(ref currentActor, "Name: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.ShortDescription = ParseValue(ref currentActor, "Short Description: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.LongDescription = ParseValue(ref currentActor, "Long Description: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.Description = ParseValue(ref currentActor, "Description: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.Level = int.Parse(ParseValue(ref currentActor, "Level: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.CurrentExp = int.Parse(ParseValue(ref currentActor, "Current Exp: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                int HP = int.Parse(ParseValue(ref currentActor, "Max HP: ", GlobalLineTerminator));
+                actor.CurrentHP = HP;
+                actor.MaxHP = HP;
+                TrimCurrentLine(ref currentActor);
+                int MP = int.Parse(ParseValue(ref currentActor, "Max MP: ", GlobalLineTerminator));
+                actor.CurrentMP = MP;
+                actor.MaxMP = MP;
+                TrimCurrentLine(ref currentActor);
+                actor.Strength = int.Parse(ParseValue(ref currentActor, "Strength: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Dexterity = int.Parse(ParseValue(ref currentActor, "Dexterity: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Constitution = int.Parse(ParseValue(ref currentActor, "Constitution: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Intelligence = int.Parse(ParseValue(ref currentActor, "Intelligence: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Wisdom = int.Parse(ParseValue(ref currentActor, "Wisdom: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Charisma = int.Parse(ParseValue(ref currentActor, "Charisma: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Gold = int.Parse(ParseValue(ref currentActor, "Gold: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                area.Actors[actor.ID] = actor;
+                actor.MoveActor(area.Rooms[1]);
+
+                actorList = currentActor;
+            }
         }
 
         public static void ParseExits(Room room, string roomData)
@@ -599,7 +660,6 @@ namespace TextAdventure
                     }
                 }
                 TrimCurrentLine(ref currentObject);
-                // TODO: Remove the following line once object flags can be parsed
                 string[] objectFlags = ParseValue(ref currentObject, "Object Flags: ", terminator).Split(',');
                 ParseObjectFlags(obj, objectFlags);
                 TrimCurrentLine(ref currentObject);
@@ -637,7 +697,7 @@ namespace TextAdventure
             Area area = new Area();
             Game.areas.Add(area);
             area.ID = ParseID(ref areaData);
-            area.Filename = ParseValue(ref areaData, "Filename", "\n");
+            area.Filename = ParseValue(ref areaData, "Filename: ", "\n");
             TrimCurrentLine(ref areaData);
             area.Name = ParseName(ref areaData);
             areaData = Area.TrimAreaData(areaData, "\n");
@@ -650,8 +710,6 @@ namespace TextAdventure
             area.ActorCount = ParseEntityCount(areaData, "Actor");
             areaData = Area.TrimAreaData(areaData, "\n");
             area.InitializeEntities();
-            ParseObjects(area, ref areaData);
-            ParseRooms(area, ref areaData);
         }
 
         public static void SpawnObject(Actor creator, string args)

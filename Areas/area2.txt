@@ -20,6 +20,9 @@ Object Flags: "canTake":false
 --END_OBJECT--
 **END_OBJECT_LIST**
 
+**ACTOR_LIST**
+**END_ACTOR_LIST**
+
 **ROOM_LIST**
 --ROOM--
 ID: 0

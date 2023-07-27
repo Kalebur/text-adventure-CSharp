@@ -9,7 +9,7 @@ namespace TextAdventure
 {
     internal class Room
     {
-        
+        public readonly static Room nullRoom = new Room();
 
         public string Name { get; set; }
         public string Description { get; set; }

@@ -31,11 +31,11 @@ namespace TextAdventure
         public Room ConnectedRoom { get; set; }
         public int ConnectedAreaID { get; set; }
         public int ConnectedRoomID { get; set; }
-        //public string DirectionName
-        //{
-        //    get { return _directionName; }
-        //    set { _directionName = value; }
-        //}
+        public bool IsClosed { get; set; }
+        public bool IsClosable { get; set; }
+        public bool IsLockable { get; set; }
+        public bool IsLocked { get; set; }
+        public WorldObject? Key { get; set; }
         public Dictionary<string, bool> ExitFlags { get; set; } = new Dictionary<string, bool>();
 
         public RoomExit()

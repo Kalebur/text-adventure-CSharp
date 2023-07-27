@@ -88,6 +88,7 @@ namespace TextAdventure
         public virtual void DisplayFullObjectInfo()
         {
             Console.WriteLine($"ID: {ID}");
+            Console.WriteLine($"Object Type: {this.GetType()}");
             Console.Write($"Keywords: ");
 
             for (int i = 0; i < Keywords.Length; i++)

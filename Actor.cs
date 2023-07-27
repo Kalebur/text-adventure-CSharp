@@ -64,7 +64,7 @@ namespace TextAdventure
             Charisma = 10;
             Gold = 0;
             InCombat = false;
-            CurrentRoom = new Room();
+            CurrentRoom = Room.nullRoom;
             IsPlayer = false;
             ID = 0;
             Equipment.Add(WorldObject.WearLocation.HEAD, null);
