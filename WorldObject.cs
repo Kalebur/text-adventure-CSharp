@@ -30,6 +30,8 @@ namespace TextAdventure
         public float Weight { get; set; }
         public Dictionary<string, bool> ObjectFlags { get; set; } = new Dictionary<string, bool>();
 
+        public static readonly WorldObject nullObject = new();
+
 
         public WorldObject()
         {

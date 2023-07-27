@@ -128,13 +128,13 @@ namespace TextAdventure
         /// </summary>
         /// <param name="targetObj"></param>
         /// <returns>The object if found, null if not found.</returns>
-        public WorldObject? ObjectInRoom(string targetObj)
+        public WorldObject ObjectInRoom(string targetObj)
         {
             foreach (var obj in objectsInRoom)
             {
                 if (obj.ShortDescription.ToLower().Contains(targetObj) || obj.Keywords.Contains(targetObj)) return obj;
             }
-            return null;
+            return WorldObject.nullObject;
         }
 
         public bool ObjectInRoom(WorldObject obj)

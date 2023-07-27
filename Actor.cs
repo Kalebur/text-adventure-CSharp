@@ -250,18 +250,19 @@ namespace TextAdventure
                 string targetContainer = splitArgs[1].ToLower();
                 string itemNotFoundMessage = "There's nothing like that in ";
                 // First, check if the container is something the player is carrying
-                int objIndex = IsCarrying(targetContainer);
-                if (objIndex != -1) {
-                    Container c = (Container)Inventory[objIndex];
+                
+                if (IsCarrying(targetContainer, out WorldObject item)) {
+                    Container c = (Container)item;
                     c.ObjectFromContainer(objToTake, itemNotFoundMessage, this);
-                } else if (objIndex == -1)
+                } else if (IsCarrying(targetContainer) == -1)
                 {
                     // Player isn't carrying the container, so look for it in the room they're in
                     var roomContainer = (Container)CurrentRoom.ObjectInRoom(targetContainer);
-                    if (roomContainer != null)
+                    if (roomContainer != WorldObject.nullObject)
                     {
                         roomContainer.ObjectFromContainer(objToTake, itemNotFoundMessage, this);
-                    } else if (roomContainer != null && !Container.IsContainer(roomContainer))
+                    } else if (roomContainer != WorldObject.nullObject && 
+                        !Container.IsContainer(roomContainer))
                     {
                         Console.WriteLine("That's not a container!");
                     } else
