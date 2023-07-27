@@ -33,9 +33,12 @@ namespace TextAdventure
         public int Charisma { get; set; }
         public int Gold { get; set; }
 
+        // Battle / status effect flags
         public bool InCombat { get; set; }
         public bool IsPlayer { get; set; }
         public bool IsAsleep { get; set; }
+
+        // Location, inventory and equipment fields
         public Room CurrentRoom { get; set; }
         public List<WorldObject> Inventory { get; set; } = new List<WorldObject>();
         public Dictionary<WorldObject.WearLocation, WorldObject?> Equipment { get; set; } = new Dictionary<WorldObject.WearLocation, WorldObject?>();
@@ -193,18 +196,22 @@ namespace TextAdventure
             return false;
         }
 
-        public void ExamineObject(string targetObject)
-        {
-            int itemIndex = IsCarrying(targetObject);
-            if (itemIndex != -1)
-            {
-                Inventory[itemIndex].DisplayObjectInfo();
-            } else
-            {
-                Console.WriteLine("You aren't carrying that.");
-            }
-        }
+        /*****************************************************************
+         *                                                               *
+         *                                                               *
+         *                     PLAYER ACTION COMMANDS                    *
+         *                                                               *
+         *                                                               *
+         *****************************************************************/
 
+        /// <summary>
+        /// Handles player picking up things or getting them out of containers.
+        /// </summary>
+        /// <param name="args">
+        /// A string which will be split into individual arguments, which are then handled based on the number of args.
+        /// Arg 1: The item to pick up or take.
+        /// Arg 2: A container to search for either in the player's inventory or within the room itself if not carried by player.
+        /// </param>
         public void DoGet(string args)
         {
             if (args == "get")
@@ -215,7 +222,7 @@ namespace TextAdventure
             string[] splitArgs = args.Split(' ');
             
 
-            // If args is only two items, get object from current room
+            // If args is only two values, get object from current room
             if (splitArgs.Length == 1)
             {
                 string objToGet = splitArgs[0];
@@ -236,7 +243,7 @@ namespace TextAdventure
                     Console.WriteLine("You don't see anything like that here.");
                 }
             }
-            // If args is two+ items, try to take something from a container
+            // If args is two+ values, try to take something from a container
             else
             {
                 string objToTake = splitArgs[0].ToLower();
@@ -264,6 +271,106 @@ namespace TextAdventure
                     }
                     
                 }
+            }
+        }
+
+
+        public void DoLook(string args)
+        {
+            if (args == "look")
+            {
+                CurrentRoom.DisplayRoom();
+            }
+            else
+            {
+                string target = args.Split(' ')[0];
+                if (target == "self")
+                {
+                    Console.WriteLine("You look yourself over.");
+                    Console.WriteLine(Description);
+                    ShowEquipment();
+                } else
+                {
+                    foreach (Actor actor in CurrentRoom.actorsInRoom)
+                    {
+                        if (actor.Name.ToLower().Contains(target) || actor.ShortDescription.ToLower().Contains(target))
+                        {
+                            Console.WriteLine(actor.Description);
+                            actor.ShowEquipment();
+                            return;
+                        }
+                    }
+                    Console.WriteLine("You don't see anyone like that here.");
+                }
+                
+            }
+        }
+
+        public void DoDrop(string args)
+        {
+            if (args == "drop")
+            {
+                Console.WriteLine("Drop what?");
+                return;
+            }
+            else if (IsCarrying(args, out WorldObject targetItem))
+            {
+                targetItem.ObjectToRoom(CurrentRoom);
+                Console.WriteLine($"You drop {targetItem.ShortDescription}.");
+                Inventory.Remove(targetItem);
+                return;
+            }
+            else
+            {
+                Console.WriteLine("You aren't carrying that.");
+                return;
+            }
+        }
+
+        public void DoExamine(string args)
+        {
+            if (args == "exa" ||  args == "examine")
+            {
+                Console.WriteLine("Examining imaginary objects?");
+                return;
+            } else
+            {
+                string[] splitArgs = args.Split(' ');
+                string targetObject = splitArgs[0];
+                if (IsCarrying(targetObject, out WorldObject carriedItem))
+                {
+                    carriedItem.DisplayObjectInfo();
+                } else
+                {
+                    Console.WriteLine("You aren't carrying that.");
+
+                }
+            }
+        }
+
+        public void DoOstat(string args)
+        {
+            string[] splitArgs = args.Split(' ');
+            try
+            {
+                int areaID = int.Parse(splitArgs[0]);
+                int objectID = int.Parse(splitArgs[1]);
+                try
+                {
+                    var targetObj = Game.areas[areaID].Objects[objectID];
+                    targetObj.DisplayFullObjectInfo();
+                }
+                catch
+                {
+                    Console.WriteLine("Unable to locate specified item.");
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Get stats for which object?");
+                Console.WriteLine("Usage: ostat AREA_ID OBJECT_ID");
+                Console.WriteLine("Ex: ostat 0 2");
+                return;
             }
         }
     }

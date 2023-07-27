@@ -16,13 +16,20 @@ namespace TextAdventure
         private static Actor _player;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
+        public static readonly string UniversalPadding = "".PadLeft(5);
+
         public static Actor Player
         {
             get { return _player; }
             set { _player = value; }
         }
 
-        private static readonly List<Area> areas = new();
+        public static readonly List<Area> areas = new();
+
+        private static void QuitGame()
+        {
+            isPlaying = false;
+        }
 
 
         public static void ProcessCommand(string command)
@@ -30,34 +37,14 @@ namespace TextAdventure
             string[] splitCommand = command.ToLower().Split(' ');
             WorldObject targetObject;
             int targetIndex;
-            string args = command[(command.IndexOf(' ') + 1)..];
+            string args = command[(command.IndexOf(' ') + 1)..].ToLower();
             switch (splitCommand[0]) {
                 case "quit":
-                    isPlaying = false;
+                    QuitGame();
                     break;
 
                 case "look":
-                    if (splitCommand.Length == 1)
-                    {
-                        Player.CurrentRoom.DisplayRoom();
-                    } else if (splitCommand[1] == "self")
-                    {
-                        Console.WriteLine("You look yourself over.");
-                        Console.WriteLine(Player.Description);
-                        Player.ShowEquipment();
-                    } else
-                    {
-                        foreach(Actor actor in Player.CurrentRoom.actorsInRoom)
-                        {
-                            if (actor.Name.Contains(splitCommand[1]) || actor.ShortDescription.Contains(splitCommand[1]))
-                            {
-                                Console.WriteLine(actor.Description);
-                                actor.ShowEquipment();
-                                return;
-                            }
-                        }
-                        Console.WriteLine("You don't see anyone like that here.");
-                    }
+                    Player.DoLook(args);
                     break;
 
                 case "ne":
@@ -124,21 +111,7 @@ namespace TextAdventure
                     break;
 
                 case "drop":
-                    if (splitCommand.Length == 1)
-                    {
-                        Console.WriteLine("Drop what?");
-                        break;
-                    }
-                    targetIndex = Player.IsCarrying(splitCommand[1]);
-                    if (targetIndex != -1)
-                    {
-                        Player.Inventory[targetIndex].ObjectToRoom(Player.CurrentRoom);
-                        Console.WriteLine($"You drop {Player.Inventory[targetIndex].ShortDescription}.");
-                        Player.Inventory[targetIndex].ObjectFromActor(Player);
-                    } else
-                    {
-                        Console.WriteLine("You aren't carrying that.");
-                    }
+                    Player.DoDrop(args);
                     break;
 
                 case "wear":
@@ -229,39 +202,17 @@ namespace TextAdventure
                     break;
 
                 case "alist":
-                    foreach(Area area in Game.areas)
-                    {
-                        Console.WriteLine($"{area.ID} - {area.Name}");
-                    }
+                    DisplayAreaList();
                     break;
 
                 case "ostat":
-                    if (splitCommand.Length == 1)
-                    {
-                        Console.WriteLine("Get stats for which object?");
-                        Console.WriteLine("Usage: ostat AREA_ID OBJECT_ID");
-                        Console.WriteLine("Ex: ostat 0 2");
-                        return;
-                    }
-                    targetObject = Game.areas[int.Parse(splitCommand[1])].Objects[int.Parse(splitCommand[2])];
-                    Console.WriteLine(targetObject.ShortDescription);
-                    Console.WriteLine(targetObject.GetType());
-                    Console.Write("Can be worn on: ");
-                    foreach (var loc in targetObject.WearLocations)
-                    {
-                        Console.Write($"{loc},");
-                    }
+                    Player.DoOstat(args);
                     break;
 
                 case "exa":
                 case "examine":
                     {
-                        if (splitCommand.Length == 1)
-                        {
-                            Console.WriteLine("Examining imaginary objects again?");
-                            break;
-                        }
-                        Player.ExamineObject(splitCommand[1]);
+                        Player.DoExamine(args);
                         break;
                     }
 
@@ -730,6 +681,42 @@ namespace TextAdventure
             WorldObject obj = areas[areaID].Objects[itemID];
             obj.ObjectToActor(creator);
             Console.WriteLine($"You reach into the ether and pull out {obj.ShortDescription}!");
+        }
+
+        public static void DisplayAreaList()
+        {
+            foreach (var area in areas) 
+            {
+                Console.WriteLine($"{area.ID} - {area.Name}");
+            }
+        }
+
+        public static void PrintColoredText(string text, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black)
+        {
+            Console.ForegroundColor = foregroundColor;
+            Console.BackgroundColor = backgroundColor;
+            ConsoleColor defaultForegroundColor = ConsoleColor.Gray;
+            ConsoleColor defaultBackgroundColor = ConsoleColor.Black;
+
+            Console.Write(text);
+
+            Console.ForegroundColor = defaultForegroundColor;
+            Console.BackgroundColor = defaultBackgroundColor;
+        }
+
+        public static void PrintCommaSeparatedList(dynamic list)
+        {
+            for (int i = 0; i <  list.Count; i++)
+            {
+                if (i < list.Count - 1)
+                {
+                    Console.Write($"{list[i]}, ");
+                }
+                else
+                {
+                    Console.WriteLine(list[i]);
+                }
+            }
         }
     }
 }

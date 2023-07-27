@@ -80,5 +80,42 @@ namespace TextAdventure
             return -1;
         }
 
+        /// <summary>
+        /// A more detailed version of DisplayObjectInfo that shows every property on the object.
+        /// </summary>
+        public virtual void DisplayFullObjectInfo()
+        {
+            Console.WriteLine($"ID: {ID}");
+            Console.Write($"Keywords: ");
+
+            for (int i = 0; i < Keywords.Length; i++)
+            {
+                if (i == Keywords.Length - 1)
+                {
+                    Console.Write($"{Keywords[i].ToString()}\n");
+                } else
+                {
+                    Console.Write($"{Keywords[i]}, ");
+                }
+            }
+
+            Console.WriteLine($"Short Description: {ShortDescription}");
+            Console.WriteLine($"Long Description: {LongDescription}");
+            Console.WriteLine($"Description: {Description}");
+            Console.WriteLine($"Weight: {Weight}");
+            Console.Write("Wearable On: ");
+            Game.PrintCommaSeparatedList(WearLocations);
+            Console.WriteLine("Object Flags: ");
+            foreach (var flag in ObjectFlags)
+            {
+                Console.Write($"{Game.UniversalPadding}{flag.Key}: ");
+                ConsoleColor flagColor;
+                if (flag.Value) { flagColor = ConsoleColor.Green; }
+                else { flagColor = ConsoleColor.Red; }
+                Game.PrintColoredText(flag.Value.ToString(), flagColor);
+                Console.WriteLine();
+            }
+        }
+
     }
 }

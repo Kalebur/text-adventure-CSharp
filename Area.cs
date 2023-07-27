@@ -83,7 +83,6 @@ namespace TextAdventure
                 Actor actor = new Actor();
                 Actors.Add(actor);
             }
-
         }
     }
 }
