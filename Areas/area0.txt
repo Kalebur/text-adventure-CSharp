@@ -1,9 +1,9 @@
-ID: 3
+ID: 0
 Filename: area2.txt
 Name: FILE-BASED Area #2
 Description: The second area created entirely using FILE READING! Isn't it AMAZING?!
-Room Count: 4
-Object Count: 2
+Room Count: 6
+Object Count: 4
 Actor Count: 2
 
 **OBJECT_LIST**
@@ -12,7 +12,7 @@ Object Type: container
 ID: 0
 Keywords: teddy,bear
 Short Description: a teddy bear
-Long Description: A huge teddy bear is lying on the ground
+Long Description: A huge teddy bear is lying on the ground.
 Description: A huge teddy bear with big, brown eyes. There is a zipper on its back, and the stuffing has been removed.
 Weight: 5
 Wear Locations: HELD
@@ -33,6 +33,30 @@ Long Description: A huge butcher's cleaver has been dropped here.
 Description: A huge cleaver with numerous blood stains all over the blade. The steel handle shows signs of rust, but the blade itself is still razor sharp.
 Weight: 5
 Wear Locations: HELD
+Object Flags: "canTake":true
+--END_OBJECT--
+
+--OBJECT--
+Object Type: equipment
+ID: 2
+Keywords: dalton,trucker,hat
+Short Description: a "Dalton's Shipping Agency" trucker hat
+Long Description: A "Dalton's Shipping Agency" trucker hat is on the ground.
+Description: A black trucker hat. It looks well worn with a curved bill and a few loose threads here and there. On the front is the faded logo for "Dalton's Shipping Agency."
+Weight: 1
+Wear Locations: HEAD
+Object Flags: "canTake":true
+--END_OBJECT--
+
+--OBJECT--
+Object Type: equipment
+ID: 3
+Keywords: band,t-shirt
+Short Description: a "KISS" t-shirt
+Long Description: A t-shirt for the band "KISS" lies crumpled on the ground.
+Description: A faded black t-shirt with all of the members of the band, "KISS," pictured on the front. The shirt has a number of small holes and tears all over it. The face of one of the band members has been marked out with a black marker.
+Weight: 1
+Wear Locations: TORSO
 Object Flags: "canTake":true
 --END_OBJECT--
 **END_OBJECT_LIST**
@@ -80,20 +104,20 @@ Gold: 25
 **ROOM_LIST**
 --ROOM--
 ID: 0
-Name: Tavern - "An Endless Void"
+Name: An Endless Void
 Description: A nebulous void of nothingness. Dark clouds go on endlessly in all directions. To the north is a doorway with blinding light spilling forth.
 
 **EXIT_LIST**
 --EXIT--
-Direction: South
+Direction: North
 Connected Area ID: 0
-Connected Room ID: 5
+Connected Room ID: 1
 --END_EXIT--
 
 --EXIT--
-Direction: North
-Connected Area ID: 3
-Connected Room ID: 1
+Direction: West
+Connected Area ID: 1
+Connected Room ID: 0
 --END_EXIT--
 
 **END_EXIT_LIST**
@@ -107,14 +131,20 @@ Description: The hallowed halls of 'The First Room,' the room which was created 
 **EXIT_LIST**
 --EXIT--
 Direction: South
-Connected Area ID: 3
+Connected Area ID: 0
 Connected Room ID: 0
 --END_EXIT--
 
 --EXIT--
 Direction: Northeast
-Connected Area ID: 3
+Connected Area ID: 0
 Connected Room ID: 2
+--END_EXIT--
+
+--EXIT--
+Direction: West
+Connected Area ID: 2
+Connected Room ID: 0
 --END_EXIT--
 **END_EXIT_LIST**
 
@@ -128,13 +158,13 @@ Description: The bedrooms are away from all the hustle and bustle of the tavern 
 **EXIT_LIST**
 --EXIT--
 Direction: Southwest
-Connected Area ID: 3
+Connected Area ID: 0
 Connected Room ID: 1
 --END_EXIT--
 
 --EXIT--
 Direction: North
-Connected Area ID: 3
+Connected Area ID: 0
 Connected Room ID: 3
 --END_EXIT--
 
@@ -150,14 +180,50 @@ Description: The room is incredibly spacious for a tavern bathroom. A bath tub b
 **EXIT_LIST**
 --EXIT--
 Direction: South
-Connected Area ID: 3
+Connected Area ID: 0
 Connected Room ID: 2
 --END_EXIT--
 
 --EXIT--
 Direction: North
-Connected Area ID: 3
+Connected Area ID: 0
+Connected Room ID: 4
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+
+--ROOM--
+ID: 4
+Name: Mess Hall
+Description: Ugh, this hall sure is a mess!
+
+**EXIT_LIST**
+--EXIT--
+Direction: South
+Connected Area ID: 0
 Connected Room ID: 3
+--END_EXIT--
+
+--EXIT--
+Direction: West
+Connected Area ID: 0
+Connected Room ID: 5
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+
+--ROOM--
+ID: 5
+Name: Kitchen
+Description: A long counter nearly 20 feet in length runs along the center of the room. Around the walls are a half-dozen ovens. Rusty pots, pans and other utensils are strewn about the area. Decaying foodstuffs fill the room with a powerful stench.
+
+**EXIT_LIST**
+--EXIT--
+Direction: East
+Connected Area ID: 0
+Connected Room ID: 4
 --END_EXIT--
 **END_EXIT_LIST**
 

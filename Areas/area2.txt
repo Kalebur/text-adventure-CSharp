@@ -40,7 +40,7 @@ Custom Name: FloorPanel
 --EXIT--
 Direction: East
 Connected Area ID: 0
-Connected Room ID: 0
+Connected Room ID: 1
 --END_EXIT--
 
 --EXIT--

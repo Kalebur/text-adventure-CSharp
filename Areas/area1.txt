@@ -50,7 +50,7 @@ Description: It's a tavern, created from a file. How did I turn a piece of paper
 --EXIT--
 Direction: East
 Connected Area ID: 0
-Connected Room ID: 1
+Connected Room ID: 0
 --END_EXIT--
 
 --EXIT--
