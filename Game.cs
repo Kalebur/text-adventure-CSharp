@@ -35,16 +35,15 @@ namespace TextAdventure
         public static void ProcessCommand(string command)
         {
             string[] splitCommand = command.ToLower().Split(' ');
-            WorldObject targetObject;
             int targetIndex;
-            string args = command[(command.IndexOf(' ') + 1)..].ToLower();
+            string args = command[(command.IndexOf(' ') + 1)..];
             switch (splitCommand[0]) {
                 case "quit":
                     QuitGame();
                     break;
 
                 case "look":
-                    Player.DoLook(args);
+                    Player.DoLook(args.ToLower());
                     break;
 
                 case "ne":
@@ -107,11 +106,11 @@ namespace TextAdventure
                     break;
 
                 case "get":
-                    Player.DoGet(args);
+                    Player.DoGet(args.ToLower());
                     break;
 
                 case "drop":
-                    Player.DoDrop(args);
+                    Player.DoDrop(args.ToLower());
                     break;
 
                 case "wear":
@@ -182,7 +181,7 @@ namespace TextAdventure
 
                 case "remove":
                 case "rem":
-                    Player.DoRemove(args);
+                    Player.DoRemove(args.ToLower());
                     break;
 
                 case "alist":
@@ -190,15 +189,17 @@ namespace TextAdventure
                     break;
 
                 case "ostat":
-                    Actor.DoOstat(args);
+                    Actor.DoOstat(args.ToLower());
                     break;
 
                 case "exa":
                 case "examine":
-                    {
-                        Player.DoExamine(args);
-                        break;
-                    }
+                    Player.DoExamine(args.ToLower());
+                    break;
+
+                case "say":
+                    Player.DoSay(args);
+                    break;
 
                 case "put":
                     if (splitCommand.Length < 3)
@@ -266,7 +267,7 @@ namespace TextAdventure
                     break;
 
                 case "oinvoke":
-                    SpawnObject(Player, args);
+                    SpawnObject(Player, args.ToLower());
                     break;
 
                 default:
@@ -411,7 +412,7 @@ namespace TextAdventure
             while (Game.isPlaying)
             {
                 DisplayPrompt();
-                userInput = Console.ReadLine().ToLower();
+                userInput = Console.ReadLine();
                 Game.ProcessCommand(userInput);
             }
         }
@@ -678,14 +679,20 @@ namespace TextAdventure
             }
         }
 
-        public static void PrintColoredText(string text, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black)
+        public static void PrintColoredText(string text, ConsoleColor foregroundColor, bool newLine, ConsoleColor backgroundColor = ConsoleColor.Black)
         {
             Console.ForegroundColor = foregroundColor;
             Console.BackgroundColor = backgroundColor;
             ConsoleColor defaultForegroundColor = ConsoleColor.Gray;
             ConsoleColor defaultBackgroundColor = ConsoleColor.Black;
 
-            Console.Write(text);
+            if (newLine)
+            {
+                Console.WriteLine(text);
+            } else
+            {
+                Console.Write(text);
+            }
 
             Console.ForegroundColor = defaultForegroundColor;
             Console.BackgroundColor = defaultBackgroundColor;

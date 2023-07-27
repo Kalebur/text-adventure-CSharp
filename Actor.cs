@@ -228,13 +228,13 @@ namespace TextAdventure
                 string objToGet = splitArgs[0];
                 WorldObject? targetObject = CurrentRoom.ObjectInRoom(objToGet);
 
-                if (targetObject != null && targetObject.ObjectFlags["canTake"])
+                if (targetObject != WorldObject.nullObject && targetObject.ObjectFlags["canTake"])
                 {
                     targetObject.ObjectToActor(this);
                     targetObject.ObjectFromRoom(this.CurrentRoom);
                     Console.WriteLine($"You get {targetObject.ShortDescription}.");
                 }
-                else if (targetObject != null && !targetObject.ObjectFlags["canTake"])
+                else if (targetObject != WorldObject.nullObject && !targetObject.ObjectFlags["canTake"])
                 {
                     Console.WriteLine("Sorry, you can't take that. Not EVERYTHING is just free for the taking, you know! Ugh, greedy adventurers...");
                 }
@@ -397,6 +397,17 @@ namespace TextAdventure
                 }
                 Console.WriteLine("You're not wearing that.");
             }
+        }
+
+        public void DoSay(string args)
+        {
+            if (args == "say")
+            {
+                Console.WriteLine("You open your mouth to speak but change your mind.");
+                return;
+            }
+
+            Game.PrintColoredText($"You say, '{args}'", ConsoleColor.Cyan, true);
         }
     }
 }

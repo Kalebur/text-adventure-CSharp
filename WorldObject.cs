@@ -114,8 +114,8 @@ namespace TextAdventure
                 ConsoleColor flagColor;
                 if (flag.Value) { flagColor = ConsoleColor.Green; }
                 else { flagColor = ConsoleColor.Red; }
-                Game.PrintColoredText(flag.Value.ToString(), flagColor);
-                Console.WriteLine();
+                Game.PrintColoredText(flag.Value.ToString(), flagColor, true);
+                //Console.WriteLine();
             }
         }
 
