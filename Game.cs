@@ -18,6 +18,7 @@ namespace TextAdventure
 
         public static readonly string UniversalPadding = "".PadLeft(5);
         public static readonly string GlobalLineTerminator = "\n";
+        public static Random diceRoller = new();
 
         public static Actor Player
         {
@@ -30,6 +31,16 @@ namespace TextAdventure
         private static void QuitGame()
         {
             isPlaying = false;
+        }
+
+        public static string CenterText(string text, int totalLength = 40)
+        {
+            string centeredText = "";
+            int startIndex = (totalLength - text.Length) / 2;
+            int leftPadding = startIndex - 1;
+            int rightPadding = totalLength - leftPadding;
+
+            return $"{"".PadLeft(leftPadding)}{text.PadRight(rightPadding)}";
         }
 
 
@@ -232,7 +243,7 @@ namespace TextAdventure
                                 {
                                     Console.WriteLine("There's nothing like that here.");
                                     return;
-                                } else if (!(container is Container))
+                                } else if (container is not Container)
                                 {
                                     Console.WriteLine("That's not a container.");
                                     return;
@@ -271,6 +282,16 @@ namespace TextAdventure
                     SpawnObject(Player, args.ToLower());
                     break;
 
+                case "kill":
+                case "attack":
+                case "k":
+                    Player.DoKill(args.ToLower());
+                    break;
+
+                case "mstat":
+                    Player.DoMstat(args.ToLower());
+                    break;
+
                 default:
                     Console.WriteLine("WHAT?!");
                     break;
@@ -284,8 +305,6 @@ namespace TextAdventure
             Console.Write("> ");
         }
 
-        // TODO: Most of this is hardcoded game data and needs to be removed once full file parsing
-        // functionality is implemented.
         public static void InitializeGame()
         {
             LoadAreas();
@@ -297,7 +316,9 @@ namespace TextAdventure
             Player = new Actor
             {
                 IsPlayer = true,
-                Description = "This adventurer has an aura of such daring that it's illegal in three countries! (Seriously, they're wanted in two of those already!)"
+                Description = "This adventurer has an aura of such daring that it's illegal in three countries! (Seriously, they're wanted in two of those already!)",
+                CurrentHP = 500,
+                MaxHP = 500
             };
             Player.MoveActor(areas[0].Rooms[0]);
         }
@@ -311,7 +332,9 @@ namespace TextAdventure
             {
                 DisplayPrompt();
                 userInput = Console.ReadLine();
+#pragma warning disable CS8604 // Possible null reference argument.
                 Game.ProcessCommand(userInput);
+#pragma warning restore CS8604 // Possible null reference argument.
             }
         }
 
@@ -406,7 +429,6 @@ namespace TextAdventure
         {
             string actorList = areaData[areaData.IndexOf("**ACTOR_LIST**")..];
             string actorInitializer = "--ACTOR--";
-            string actorTerminator = "--END_ACTOR--\r\n";
 
             while (actorList.IndexOf(actorInitializer) != -1)
             {
@@ -686,6 +708,81 @@ namespace TextAdventure
                     Console.WriteLine(list[i]);
                 }
             }
+        }
+
+        public static void StartCombat(Actor attacker, Actor target)
+        {
+            attacker.InCombat = true;
+            target.InCombat = true;
+            attacker.Opponents.Add(target);
+            target.Opponents.Add(attacker);
+            ConsoleColor deathColor = ConsoleColor.Red;
+
+            while (attacker.CurrentHP >= 0 && target.CurrentHP >= 0)
+            {
+                PerformCombatRound(attacker, target);
+            }
+
+            // At this point, someone's HP is below zero. Check to see who died
+            if ((attacker.CurrentHP <= 0 && attacker.IsPlayer) ||
+                (target.CurrentHP <=0 && target.IsPlayer))
+            {
+                PrintColoredText("YOU ARE DEAD!", deathColor, true);
+                isPlaying = false;
+                return;
+            }
+            else if (attacker.CurrentHP <= 0)
+            {
+                PrintColoredText($"{UniversalPadding}{attacker.ShortDescription} is DEAD!", deathColor, true);
+                Console.WriteLine($"You gain {attacker.CurrentExp}EXP and {attacker.Gold} Gold!");
+                attacker.CurrentRoom.actorsInRoom.Remove(attacker);
+                target.InCombat = false;
+                target.CurrentExp += attacker.CurrentExp;
+                target.Gold += attacker.Gold;
+            } else
+            {
+                PrintColoredText($"{UniversalPadding}{target.ShortDescription} is DEAD!", deathColor, true);
+                Console.WriteLine($"You gain {target.CurrentExp}EXP and {target.Gold} Gold!");
+                target.CurrentRoom.actorsInRoom.Remove(target);
+                attacker.InCombat = false;
+                attacker.CurrentExp += target.CurrentExp;
+                attacker.Gold += target.Gold;
+            }
+        }
+
+        /// <summary>
+        /// Rolls the given number of dice with the given side counts, adds any supplied modifier and returns the result
+        /// </summary>
+        /// <param name="numDie">The number of dice to roll.</param>
+        /// <param name="numSides">The number of sides the dice will have.</param>
+        /// <param name="modifier">A number to add (or subtract if negative) to the result of the dice rolls.</param>
+        /// <returns>The calculated dice roll result.</returns>
+        public static int RollDice(int numDie, int numSides, int modifier = 0)
+        {
+            int result = 0;
+
+            for (int i = 0; i < numDie; i++)
+            {
+                result += diceRoller.Next(1, numSides);
+            }
+
+            return result + modifier;
+        }
+
+        public static void PerformCombatRound(Actor attacker, Actor target)
+        {
+            int attackerDamage = 0;
+            int targetDamage = 0;
+
+            attackerDamage += RollDice(2, 6);
+
+            targetDamage += RollDice(2, 6);
+
+            Console.WriteLine($"You hit {target.ShortDescription} for {attackerDamage} points of damage!");
+            Console.WriteLine($"{target.ShortDescription} hits you for {targetDamage} points of damage!");
+
+            target.CurrentHP -= attackerDamage;
+            attacker.CurrentHP -= targetDamage;
         }
     }
 }

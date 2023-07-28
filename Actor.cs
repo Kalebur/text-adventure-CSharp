@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,11 +38,14 @@ namespace TextAdventure
         public bool InCombat { get; set; }
         public bool IsPlayer { get; set; }
         public bool IsAsleep { get; set; }
+        public bool IsConscious { get; set; }
+        public bool CanWake { get; set; }
 
         // Location, inventory and equipment fields
         public Room CurrentRoom { get; set; }
         public List<WorldObject> Inventory { get; set; } = new List<WorldObject>();
         public Dictionary<WorldObject.WearLocation, WorldObject?> Equipment { get; set; } = new Dictionary<WorldObject.WearLocation, WorldObject?>();
+        public List<Actor> Opponents { get; } = new List<Actor>();
 
         public Actor()
         {
@@ -169,6 +173,24 @@ namespace TextAdventure
         public void ShowStats()
         {
 
+        }
+
+        private void DisplayActorInfo()
+        {
+            Console.WriteLine("****************************************");
+            Console.Write($"*{Game.CenterText("", 38)}*\n");
+            Console.Write($"*{Game.CenterText(ShortDescription, 38)}*\n");
+            Console.Write($"*{Game.CenterText("", 38)}*\n");
+            Console.WriteLine("****************************************");
+            Console.WriteLine($"Level: {Level.ToString().PadRight(10)} ID: {ID.ToString().PadRight(10)}");
+            Console.WriteLine($"Name: {Name}");
+            Console.WriteLine($"Short Desc: {ShortDescription}");
+            Console.WriteLine($"Long Desc: {LongDescription}");
+            Console.WriteLine("Description:");
+            Console.WriteLine($"{Game.UniversalPadding}{Description}\n");
+            Console.WriteLine($"HP: {CurrentHP}/{MaxHP}  MP: {CurrentMP}/{MaxMP}");
+            ShowEquipment();
+            ShowInventory();
         }
 
         public int IsCarrying(string targetObject)
@@ -414,6 +436,77 @@ namespace TextAdventure
             }
 
             Game.PrintColoredText($"You say, '{args}'", ConsoleColor.Cyan, true);
+        }
+
+        public void DoKill(string args)
+        {
+            if (args == "self")
+            {
+                Console.WriteLine("Do...do I need to schedule you a therapist appointment?");
+                return;
+            } else if (args == "kill" || args == "attack")
+            {
+                Console.WriteLine("You take a swing at an imaginary target. CRITICAL HIT!");
+            } else
+            {
+                foreach (Actor actor in this.CurrentRoom.actorsInRoom)
+                {
+                    if (actor.Name.ToLower().Contains(args) || actor.ShortDescription.ToLower().Contains(args))
+                    {
+                        Game.StartCombat(this, actor);
+                        return;
+                    }
+                }
+                Console.WriteLine("You don't see anyone like that here.");
+            }
+        }
+
+        public void DoMstat(string args)
+        {
+            static void DisplayUsage()
+            {
+                Console.WriteLine("Get stats on which mob?");
+                Console.WriteLine("Usage: mstat [AREA ID] [ACTOR ID]");
+                Console.WriteLine("Alt Usage: mstat [TARGET 'e.g; skeleton']");
+            }
+
+            if (args == "mstat")
+            {
+                DisplayUsage();
+            } else
+            {
+                string[] splitArgs = args.Split(' ');
+
+                // If the length of args is only one, act as if looking for
+                // target by name
+                if (splitArgs.Length == 1) {
+                    string target = splitArgs[0];
+
+                    foreach (Actor mob in CurrentRoom.actorsInRoom)
+                    {
+                        if (mob.Name.ToLower().Contains(target) ||
+                            mob.ShortDescription.ToLower().Contains(target))
+                        {
+                            mob.DisplayActorInfo();
+                            return;
+                        }
+                    }
+
+                    Console.WriteLine("You don't see anyone like that here.");
+                } else
+                {
+                    try
+                    {
+                        int areaID = int.Parse(splitArgs[0]);
+                        int actorID = int.Parse(splitArgs[1]);
+                        Game.areas[areaID].Actors[actorID].DisplayActorInfo();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Unable to find specified actor.");
+                    }
+                }
+            }
         }
     }
 }
