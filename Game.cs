@@ -35,7 +35,6 @@ namespace TextAdventure
 
         public static string CenterText(string text, int totalLength = 40)
         {
-            string centeredText = "";
             int startIndex = (totalLength - text.Length) / 2;
             int leftPadding = startIndex - 1;
             int rightPadding = totalLength - leftPadding;
@@ -316,6 +315,8 @@ namespace TextAdventure
             Player = new Actor
             {
                 IsPlayer = true,
+                Name = "Gort",
+                ShortDescription = "Gort",
                 Description = "This adventurer has an aura of such daring that it's illegal in three countries! (Seriously, they're wanted in two of those already!)",
                 CurrentHP = 500,
                 MaxHP = 500
@@ -721,9 +722,10 @@ namespace TextAdventure
             while (attacker.CurrentHP >= 0 && target.CurrentHP >= 0)
             {
                 PerformCombatRound(attacker, target);
+                Thread.Sleep(3000);
             }
 
-            // At this point, someone's HP is below zero. Check to see who died
+            // At this point, someone's HP is at or below zero. Check to see who died
             if ((attacker.CurrentHP <= 0 && attacker.IsPlayer) ||
                 (target.CurrentHP <=0 && target.IsPlayer))
             {
@@ -739,6 +741,7 @@ namespace TextAdventure
                 target.InCombat = false;
                 target.CurrentExp += attacker.CurrentExp;
                 target.Gold += attacker.Gold;
+                attacker.CurrentHP = attacker.MaxHP; // TODO: Figure out how to spawn object clones instead of referencing base object
             } else
             {
                 PrintColoredText($"{UniversalPadding}{target.ShortDescription} is DEAD!", deathColor, true);
@@ -747,6 +750,7 @@ namespace TextAdventure
                 attacker.InCombat = false;
                 attacker.CurrentExp += target.CurrentExp;
                 attacker.Gold += target.Gold;
+                target.CurrentHP = target.MaxHP;
             }
         }
 

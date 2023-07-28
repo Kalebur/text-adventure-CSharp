@@ -453,7 +453,8 @@ namespace TextAdventure
                 {
                     if (actor.Name.ToLower().Contains(args) || actor.ShortDescription.ToLower().Contains(args))
                     {
-                        Game.StartCombat(this, actor);
+                        Thread battleManager = new(() => Game.StartCombat(this, actor));
+                        battleManager.Start();
                         return;
                     }
                 }
