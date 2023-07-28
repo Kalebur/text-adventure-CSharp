@@ -165,6 +165,12 @@ namespace TextAdventure
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
+        // TODO: Implement status screen
+        public void ShowStats()
+        {
+
+        }
+
         public int IsCarrying(string targetObject)
         {
             for (int i = 0; i < Inventory.Count; i++)
