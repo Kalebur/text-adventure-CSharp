@@ -51,13 +51,20 @@ namespace TextAdventure
             {
                 Console.WriteLine(room.ID.ToString().PadLeft(5) + ": " + room.Name);
             }
+
             Console.WriteLine("");
             Console.WriteLine("Objects:");
             foreach (WorldObject obj in Objects)
             {
                 Console.WriteLine(obj.ID.ToString().PadLeft(5) + ": " + obj.ShortDescription);
             }
+
             Console.WriteLine("");
+            Console.WriteLine("Actors:");
+            foreach (Actor actor in Actors)
+            {
+                Console.WriteLine($"{Game.UniversalPadding}{actor.ID}: {actor.ShortDescription}");
+            }
         }
 
         public static string TrimAreaData(string areaData, string terminator)

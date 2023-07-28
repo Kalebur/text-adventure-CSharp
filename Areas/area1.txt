@@ -4,7 +4,7 @@ Name: The FILE-BASED Area
 Description: The first area created entirely using FILE READING! Isn't it AMAZING?!
 Room Count: 4
 Object Count: 2
-Actor Count: 3
+Actor Count: 0
 
 **OBJECT_LIST**
 --OBJECT--
@@ -37,6 +37,9 @@ Is Locked: false
 --END_OBJECT--
 **END_OBJECT_LIST**
 
+**ACTOR_LIST**
+**END_ACTOR_LIST**
+
 **ROOM_LIST**
 --ROOM--
 ID: 0
@@ -47,7 +50,7 @@ Description: It's a tavern, created from a file. How did I turn a piece of paper
 --EXIT--
 Direction: East
 Connected Area ID: 0
-Connected Room ID: 1
+Connected Room ID: 0
 --END_EXIT--
 
 --EXIT--

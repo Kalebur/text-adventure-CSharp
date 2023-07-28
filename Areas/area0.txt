@@ -1,0 +1,231 @@
+ID: 0
+Filename: area2.txt
+Name: FILE-BASED Area #2
+Description: The second area created entirely using FILE READING! Isn't it AMAZING?!
+Room Count: 6
+Object Count: 4
+Actor Count: 2
+
+**OBJECT_LIST**
+--OBJECT--
+Object Type: container
+ID: 0
+Keywords: teddy,bear
+Short Description: a teddy bear
+Long Description: A huge teddy bear is lying on the ground.
+Description: A huge teddy bear with big, brown eyes. There is a zipper on its back, and the stuffing has been removed.
+Weight: 5
+Wear Locations: HELD
+Object Flags: "canTake":true,"isClosable":true,"isClosed":false,"isLockable":false,"isLocked":false
+Max Weight: 20
+Is Closable: true
+Is Closed: false
+Is Lockable: true
+Is Locked: false
+--END_OBJECT--
+
+--OBJECT--
+Object Type: weapon
+ID: 1
+Keywords: butcher's,cleaver
+Short Description: a huge butcher's cleaver
+Long Description: A huge butcher's cleaver has been dropped here.
+Description: A huge cleaver with numerous blood stains all over the blade. The steel handle shows signs of rust, but the blade itself is still razor sharp.
+Weight: 5
+Wear Locations: HELD
+Object Flags: "canTake":true
+--END_OBJECT--
+
+--OBJECT--
+Object Type: equipment
+ID: 2
+Keywords: dalton,trucker,hat
+Short Description: a "Dalton's Shipping Agency" trucker hat
+Long Description: A "Dalton's Shipping Agency" trucker hat is on the ground.
+Description: A black trucker hat. It looks well worn with a curved bill and a few loose threads here and there. On the front is the faded logo for "Dalton's Shipping Agency."
+Weight: 1
+Wear Locations: HEAD
+Object Flags: "canTake":true
+--END_OBJECT--
+
+--OBJECT--
+Object Type: equipment
+ID: 3
+Keywords: band,t-shirt
+Short Description: a "KISS" t-shirt
+Long Description: A t-shirt for the band "KISS" lies crumpled on the ground.
+Description: A faded black t-shirt with all of the members of the band, "KISS," pictured on the front. The shirt has a number of small holes and tears all over it. The face of one of the band members has been marked out with a black marker.
+Weight: 1
+Wear Locations: TORSO
+Object Flags: "canTake":true
+--END_OBJECT--
+**END_OBJECT_LIST**
+
+**ACTOR_LIST**
+--ACTOR--
+ID: 0
+Name: a skeleton soldier
+Short Description: a skeletal soldier
+Long Description: A skeletal soldier is wandering the grounds.
+Description: The walking corpse of a long dead soldier. No flesh remains attached to its bones, and the armor it wears has been ravaged by time. The insignia of an enemy kingdom is faintly visible on the breastplate.
+Level: 1
+Current Exp: 100
+Max HP: 100
+Max MP: 0
+Strength: 5
+Dexterity: 5
+Constitution: 5
+Intelligence: 5
+Wisdom: 5
+Charisma: 5
+Gold: 25
+--END_ACTOR--
+
+--ACTOR--
+ID: 1
+Name: a zombie cook
+Short Description: a zombie cook
+Long Description: A zombie in a tattered apron and trousers is shuffling about.
+Description: You see nothing special about it. Nope. Not a thing. Absolutely nothing. It's the most UN-special zombie ever to exist. Zombies are just part of every day life. You should already know what a zombie looks like, therefore it's pointless to describe it any further.\n\nHmm? What's that? Is it a man or a woman? Human? Elf? Dwarf? Look, it's a zombie. I already said you see NOTHING SPECIAL ABOUT IT. Stop asking questions! Geez! You'd think you want details in your games or something. Dang millenials...
+Level: 1
+Current Exp: 100
+Max HP: 100
+Max MP: 0
+Strength: 5
+Dexterity: 5
+Constitution: 5
+Intelligence: 5
+Wisdom: 5
+Charisma: 5
+Gold: 25
+--END_ACTOR--
+**END_ACTOR_LIST**
+
+**ROOM_LIST**
+--ROOM--
+ID: 0
+Name: An Endless Void
+Description: A nebulous void of nothingness. Dark clouds go on endlessly in all directions. To the north is a doorway with blinding light spilling forth.
+
+**EXIT_LIST**
+--EXIT--
+Direction: North
+Connected Area ID: 0
+Connected Room ID: 1
+--END_EXIT--
+
+--EXIT--
+Direction: West
+Connected Area ID: 1
+Connected Room ID: 0
+--END_EXIT--
+
+**END_EXIT_LIST**
+--END_ROOM--
+
+--ROOM--
+ID: 1
+Name: The First Room
+Description: The hallowed halls of 'The First Room,' the room which was created first. Blessed be the walls of this sanctuary. Blessed indeed.
+
+**EXIT_LIST**
+--EXIT--
+Direction: South
+Connected Area ID: 0
+Connected Room ID: 0
+--END_EXIT--
+
+--EXIT--
+Direction: Northeast
+Connected Area ID: 0
+Connected Room ID: 2
+--END_EXIT--
+
+--EXIT--
+Direction: West
+Connected Area ID: 2
+Connected Room ID: 0
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+
+--ROOM--
+ID: 2
+Name: A Quieter Room
+Description: The bedrooms are away from all the hustle and bustle of the tavern proper, so they provide some peace and quiet for adventurers to relax and wind down after a hard day.
+
+**EXIT_LIST**
+--EXIT--
+Direction: Southwest
+Connected Area ID: 0
+Connected Room ID: 1
+--END_EXIT--
+
+--EXIT--
+Direction: North
+Connected Area ID: 0
+Connected Room ID: 3
+--END_EXIT--
+
+
+**END_EXIT_LIST**
+--END_ROOM--
+
+--ROOM--
+ID: 3
+Name: A Luxurious-er Bathroom
+Description: The room is incredibly spacious for a tavern bathroom. A bath tub big enough for two or three people sits on the far side of the room. A small table with towels, wash cloths and soaps is by the door. The room even has a flushable toilet.
+
+**EXIT_LIST**
+--EXIT--
+Direction: South
+Connected Area ID: 0
+Connected Room ID: 2
+--END_EXIT--
+
+--EXIT--
+Direction: North
+Connected Area ID: 0
+Connected Room ID: 4
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+
+--ROOM--
+ID: 4
+Name: Mess Hall
+Description: Ugh, this hall sure is a mess!
+
+**EXIT_LIST**
+--EXIT--
+Direction: South
+Connected Area ID: 0
+Connected Room ID: 3
+--END_EXIT--
+
+--EXIT--
+Direction: West
+Connected Area ID: 0
+Connected Room ID: 5
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+
+--ROOM--
+ID: 5
+Name: Kitchen
+Description: A long counter nearly 20 feet in length runs along the center of the room. Around the walls are a half-dozen ovens. Rusty pots, pans and other utensils are strewn about the area. Decaying foodstuffs fill the room with a powerful stench.
+
+**EXIT_LIST**
+--EXIT--
+Direction: East
+Connected Area ID: 0
+Connected Room ID: 4
+--END_EXIT--
+**END_EXIT_LIST**
+
+--END_ROOM--
+**END_ROOM_LIST**

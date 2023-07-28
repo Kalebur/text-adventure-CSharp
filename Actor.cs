@@ -64,7 +64,7 @@ namespace TextAdventure
             Charisma = 10;
             Gold = 0;
             InCombat = false;
-            CurrentRoom = new Room();
+            CurrentRoom = Room.nullRoom;
             IsPlayer = false;
             ID = 0;
             Equipment.Add(WorldObject.WearLocation.HEAD, null);
@@ -268,7 +268,7 @@ namespace TextAdventure
                     {
                         roomContainer.ObjectFromContainer(objToTake, itemNotFoundMessage, this);
                     } else if (roomContainer != WorldObject.nullObject && 
-                        !Container.IsContainer(roomContainer))
+                        roomContainer is Container)
                     {
                         Console.WriteLine("That's not a container!");
                     } else

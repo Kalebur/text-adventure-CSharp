@@ -17,6 +17,7 @@ namespace TextAdventure
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static readonly string UniversalPadding = "".PadLeft(5);
+        public static readonly string GlobalLineTerminator = "\n";
 
         public static Actor Player
         {
@@ -231,7 +232,7 @@ namespace TextAdventure
                                 {
                                     Console.WriteLine("There's nothing like that here.");
                                     return;
-                                } else if (!Container.IsContainer(container))
+                                } else if (!(container is Container))
                                 {
                                     Console.WriteLine("That's not a container.");
                                     return;
@@ -250,7 +251,7 @@ namespace TextAdventure
                                     Console.WriteLine("You can't put containers in themselves! Are you TRYING to destroy the universe?!");
                                     return;
                                 }
-                                else if (!Container.IsContainer(Player.Inventory[containerIndex]))
+                                else if (!(Player.Inventory[containerIndex] is Container))
                                 {
                                     Console.WriteLine("That's not a container.");
                                     return;
@@ -287,121 +288,18 @@ namespace TextAdventure
         // functionality is implemented.
         public static void InitializeGame()
         {
-            Area area = new Area();
-            areas.Add(area);
-            Room room0 = new Room();
-            Room room1 = new Room();
-            Room room2 = new Room();
-            Room room3 = new Room();
-            Room room4 = new Room();
-            Room room5 = new Room();
+            LoadAreas();
+            LoadPlayer();
+        }
 
-            room0.AddRoomToArea(area);
-            room1.AddRoomToArea(area);
-            room2.AddRoomToArea(area);
-            room3.AddRoomToArea(area);
-            room4.AddRoomToArea(area);
-            room5.AddRoomToArea(area);
-            area.RoomCount += 6;
-
-            area.Name = "The First Area";
-            area.Description = "The area which was created first. That's it. There's nothing special to the name besides that.";
-
-            room1.Name = "The First Room";
-            room1.Description = "The hallowed halls of 'The First Room,' the room which was created first. Blessed be the walls of this sanctuary. Blessed indeed.";
-            room1.AddExit("South", room0);
-            room1.AddExit("Northeast", room2);
-            
-            room0.Name = "An Endless Void";
-            room0.Description = "A nebulous void of nothingness. Dark clouds go on endlessly in all directions. To the north is a doorway with blinding light spilling forth.";
-            room0.AddExit("North", room1);
-
-            room2.Name = "Gates of Mulforth Citadel";
-            room2.Description = "The entry arch of Mulforth Citadel has one iron gate that's still partially attached by its hinges. The other gate lies ruined just inside the citadel proper.";
-            room2.AddExit("Southwest", room1);
-            room2.AddExit("North", room3);
-
-            room3.Name = "Citadel Training Grounds";
-            room3.Description = "People trained here. That's why it's called 'training' grounds.";
-            room3.AddExit("South", room2);
-            room3.AddExit("North", room4);
-
-            room4.Name = "Mess Hall";
-            room4.Description = "Ugh, this hall sure is a mess!";
-            room4.AddExit("South", room3);
-            room4.AddExit("West", room5);
-
-            room5.Name = "Kitchen";
-            room5.Description = "A long counter nearly 20 feet in length runs along the center of the room. Around the walls are a half-dozen ovens. Rusty pots, pans and other utensils are strewn about the area. Decaying foodstuffs fill the room with a powerful stench.";
-            room5.AddExit("East", room4);
-
+        private static void LoadPlayer()
+        {
             Player = new Actor
             {
-                CurrentRoom = room0,
                 IsPlayer = true,
                 Description = "This adventurer has an aura of such daring that it's illegal in three countries! (Seriously, they're wanted in two of those already!)"
             };
-
-            Actor mob1 = new()
-            {
-                CurrentRoom = room3,
-                Name = "skeletal soldier",
-                ShortDescription = "a skeletal soldier",
-                LongDescription = "A skeletal soldier is wandering the grounds.",
-                Description = "The walking corpse of a long dead soldier. No flesh remains attached to its bones, and the armor it wears has been ravaged by time. The insignia of an enemy kingdom is faintly visible on the breastplate.",
-                Level = 1,
-
-            };
-            mob1.MoveActor(room3);
-
-            Actor mob2 = new()
-            {
-                Name = "a zombie cook",
-                ShortDescription = "a zombie cook",
-                LongDescription = "A zombie in a tattered apron and trousers is shuffling about.",
-                Description = "You see nothing special about it. Nope. Not a thing. Absolutely nothing. It's the most UN-special zombie ever to exist. Zombies are just part of every day life. You should already know what a zombie looks like, therefore it's pointless to describe it any further.\n\nHmm? What's that? Is it a man or a woman? Human? Elf? Dwarf? Look, it's a zombie. I already said you see NOTHING SPECIAL ABOUT IT. Stop asking questions! Geez! You'd think you want details in your games or something. Dang millenials...",
-                Level = 2,
-                CurrentHP = 100,
-                MaxHP = 100,
-                Gold = 10,
-                CurrentExp = 250
-            };
-            mob2.MoveActor(room5);
-
-            WorldObject obj1 = new WorldObject();
-            WorldObject obj2 = new WorldObject()
-            {
-                ID = 1,
-                LongDescription = "A huge butcher's cleaver has been dropped here.",
-                Keywords = new string[] { "butcher", "cleaver" },
-                ShortDescription = "a huge butcher's cleaver",
-                Weight = 5f,
-            };
-
-            obj2.WearLocations.Add(WorldObject.WearLocation.HELD);
-            obj2.ObjectToRoom(room5);
-            obj2.ObjectFlags["canTake"] = true;
-            obj1.ObjectToRoom(room2);
-            LoadAreas();
-            room1.AddExit("West", Game.areas[1].Rooms[0]);
-            room0.AddExit("West", Game.areas[2].Rooms[0]);
-
-            Container obj3 = new Container() { MaxWeight = 50f };
-            obj3.ShortDescription = "a teddy bear";
-            obj3.LongDescription = "A big teddy bear is lying on the ground.";
-            obj3.Description = "A huge teddy bear with big, brown eyes. There is a zipper on its back, and the stuffing has been removed.";
-            obj3.ObjectFlags["canTake"] = true;
-            obj3.WearLocations.Add(WorldObject.WearLocation.HELD);
-            obj3.MaxWeight = 15f;
-            area.Objects.Add(obj3);
-            obj3.ObjectToActor(Player);
-
-            if (Player.IsCarrying("bear", out WorldObject @object))
-            {
-
-                Console.WriteLine($"You're carrying {@object.ShortDescription}, which is a {@object.GetType()}!");
-            }
-
+            Player.MoveActor(areas[0].Rooms[0]);
         }
 
         public static void Play()
@@ -423,6 +321,17 @@ namespace TextAdventure
             foreach (var file in fileList)
             {
                 ParseAreaFile(file);
+            }
+
+            string areaData;
+            foreach (var file in fileList)
+            {
+                areaData = File.ReadAllText(file);
+                int areaID = ParseID(ref areaData);
+
+                ParseObjects(areas[areaID], ref areaData);
+                ParseActors(areas[areaID], ref areaData);
+                ParseRooms(areas[areaID], ref areaData);
             }
         }
 
@@ -493,6 +402,59 @@ namespace TextAdventure
             area.Rooms[roomID].Description = roomDescription;
         }
 
+        public static void ParseActors(Area area, ref string areaData)
+        {
+            string actorList = areaData[areaData.IndexOf("**ACTOR_LIST**")..];
+            string actorInitializer = "--ACTOR--";
+            string actorTerminator = "--END_ACTOR--\r\n";
+
+            while (actorList.IndexOf(actorInitializer) != -1)
+            {
+                string currentActor = actorList[actorList.IndexOf(actorInitializer)..];
+                TrimCurrentLine(ref currentActor);
+                Actor actor = new Actor();
+                actor.ID = ParseID(ref currentActor);
+                actor.Name = ParseValue(ref currentActor, "Name: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.ShortDescription = ParseValue(ref currentActor, "Short Description: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.LongDescription = ParseValue(ref currentActor, "Long Description: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.Description = ParseValue(ref currentActor, "Description: ", GlobalLineTerminator);
+                TrimCurrentLine(ref currentActor);
+                actor.Level = int.Parse(ParseValue(ref currentActor, "Level: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.CurrentExp = int.Parse(ParseValue(ref currentActor, "Current Exp: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                int HP = int.Parse(ParseValue(ref currentActor, "Max HP: ", GlobalLineTerminator));
+                actor.CurrentHP = HP;
+                actor.MaxHP = HP;
+                TrimCurrentLine(ref currentActor);
+                int MP = int.Parse(ParseValue(ref currentActor, "Max MP: ", GlobalLineTerminator));
+                actor.CurrentMP = MP;
+                actor.MaxMP = MP;
+                TrimCurrentLine(ref currentActor);
+                actor.Strength = int.Parse(ParseValue(ref currentActor, "Strength: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Dexterity = int.Parse(ParseValue(ref currentActor, "Dexterity: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Constitution = int.Parse(ParseValue(ref currentActor, "Constitution: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Intelligence = int.Parse(ParseValue(ref currentActor, "Intelligence: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Wisdom = int.Parse(ParseValue(ref currentActor, "Wisdom: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Charisma = int.Parse(ParseValue(ref currentActor, "Charisma: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                actor.Gold = int.Parse(ParseValue(ref currentActor, "Gold: ", GlobalLineTerminator));
+                TrimCurrentLine(ref currentActor);
+                area.Actors[actor.ID] = actor;
+                actor.MoveActor(area.Rooms[1]);
+
+                actorList = currentActor;
+            }
+        }
+
         public static void ParseExits(Room room, string roomData)
         {
             while (roomData.IndexOf("--EXIT--") != -1)
@@ -548,6 +510,7 @@ namespace TextAdventure
             container.ShortDescription = obj.ShortDescription;
             container.LongDescription = obj.LongDescription;
             container.Description = obj.Description;
+            container.WearLocations = obj.WearLocations;
             container.ObjectFlags = obj.ObjectFlags;
             container.Weight = obj.Weight;
             container.MaxWeight = float.Parse(ParseValue(ref objectData, "Max Weight: ", terminator));
@@ -599,7 +562,6 @@ namespace TextAdventure
                     }
                 }
                 TrimCurrentLine(ref currentObject);
-                // TODO: Remove the following line once object flags can be parsed
                 string[] objectFlags = ParseValue(ref currentObject, "Object Flags: ", terminator).Split(',');
                 ParseObjectFlags(obj, objectFlags);
                 TrimCurrentLine(ref currentObject);
@@ -616,7 +578,6 @@ namespace TextAdventure
 
                 }
 
-                obj.ObjectToRoom(area.Rooms[1]);
                 objectData = objectData.Substring(endIndex);
 
             }
@@ -637,7 +598,7 @@ namespace TextAdventure
             Area area = new Area();
             Game.areas.Add(area);
             area.ID = ParseID(ref areaData);
-            area.Filename = ParseValue(ref areaData, "Filename", "\n");
+            area.Filename = ParseValue(ref areaData, "Filename: ", "\n");
             TrimCurrentLine(ref areaData);
             area.Name = ParseName(ref areaData);
             areaData = Area.TrimAreaData(areaData, "\n");
@@ -650,8 +611,6 @@ namespace TextAdventure
             area.ActorCount = ParseEntityCount(areaData, "Actor");
             areaData = Area.TrimAreaData(areaData, "\n");
             area.InitializeEntities();
-            ParseObjects(area, ref areaData);
-            ParseRooms(area, ref areaData);
         }
 
         public static void SpawnObject(Actor creator, string args)
