@@ -232,7 +232,7 @@ namespace TextAdventure
                                 {
                                     Console.WriteLine("There's nothing like that here.");
                                     return;
-                                } else if (!Container.IsContainer(container))
+                                } else if (!(container is Container))
                                 {
                                     Console.WriteLine("That's not a container.");
                                     return;
@@ -251,7 +251,7 @@ namespace TextAdventure
                                     Console.WriteLine("You can't put containers in themselves! Are you TRYING to destroy the universe?!");
                                     return;
                                 }
-                                else if (!Container.IsContainer(Player.Inventory[containerIndex]))
+                                else if (!(Player.Inventory[containerIndex] is Container))
                                 {
                                     Console.WriteLine("That's not a container.");
                                     return;

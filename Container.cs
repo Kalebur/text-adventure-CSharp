@@ -91,14 +91,8 @@ namespace TextAdventure
                     return true;
                 }
             }
-            i = null;
+            i = WorldObject.nullObject;
             return false;
-        }
-
-        public static bool IsContainer(dynamic obj)
-        {
-            if (obj.GetType() != typeof(Container)) return false;
-            return true;
         }
 
         public override void DisplayObjectInfo()

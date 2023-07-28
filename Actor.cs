@@ -165,6 +165,11 @@ namespace TextAdventure
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
+        public void ShowStats()
+        {
+
+        }
+
         public int IsCarrying(string targetObject)
         {
             for (int i = 0; i < Inventory.Count; i++)
@@ -262,7 +267,7 @@ namespace TextAdventure
                     {
                         roomContainer.ObjectFromContainer(objToTake, itemNotFoundMessage, this);
                     } else if (roomContainer != WorldObject.nullObject && 
-                        !Container.IsContainer(roomContainer))
+                        roomContainer is Container)
                     {
                         Console.WriteLine("That's not a container!");
                     } else

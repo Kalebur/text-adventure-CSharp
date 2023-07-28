@@ -111,7 +111,7 @@ namespace TextAdventure
             Console.WriteLine("Object Flags: ");
             foreach (var flag in ObjectFlags)
             {
-                Console.Write($"{Game.UniversalPadding}{flag.Key}: ");
+                Console.Write($"{flag.Key.PadLeft(20)}: ");
                 ConsoleColor flagColor;
                 if (flag.Value) { flagColor = ConsoleColor.Green; }
                 else { flagColor = ConsoleColor.Red; }
