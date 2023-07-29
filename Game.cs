@@ -30,6 +30,11 @@ namespace TextAdventure
 
         private static void QuitGame()
         {
+            if (Player.InCombat)
+            {
+                PrintColoredText("You can't quit while in combat!", ConsoleColor.Red, true);
+                return;
+            }
             isPlaying = false;
         }
 
@@ -300,8 +305,8 @@ namespace TextAdventure
 
         public static void DisplayPrompt()
         {
-            Console.WriteLine($"\nHP: {Player.CurrentHP}/{Player.MaxHP} MP:{Player.CurrentMP}/{Player.MaxMP} Gold: {Player.Gold}");
-            Console.Write("> ");
+            Console.WriteLine($"\nHP: {Player.CurrentHP}/{Player.MaxHP} MP:{Player.CurrentMP}/{Player.MaxMP} Gold: {Player.Gold}\n");
+            //Console.Write("> ");
         }
 
         public static void InitializeGame()
@@ -472,7 +477,7 @@ namespace TextAdventure
                 actor.Gold = int.Parse(ParseValue(ref currentActor, "Gold: ", GlobalLineTerminator));
                 TrimCurrentLine(ref currentActor);
                 area.Actors[actor.ID] = actor;
-                actor.MoveActor(area.Rooms[1]);
+                Actor.SpawnActor(actor, areas[area.ID].Rooms[1]);
 
                 actorList = currentActor;
             }
@@ -736,7 +741,7 @@ namespace TextAdventure
             else if (attacker.CurrentHP <= 0)
             {
                 PrintColoredText($"{UniversalPadding}{attacker.ShortDescription} is DEAD!", deathColor, true);
-                Console.WriteLine($"You gain {attacker.CurrentExp}EXP and {attacker.Gold} Gold!");
+                Console.WriteLine($"You gain {attacker.CurrentExp}EXP and {attacker.Gold} Gold!{GlobalLineTerminator}");
                 attacker.CurrentRoom.actorsInRoom.Remove(attacker);
                 target.InCombat = false;
                 target.CurrentExp += attacker.CurrentExp;
@@ -745,7 +750,7 @@ namespace TextAdventure
             } else
             {
                 PrintColoredText($"{UniversalPadding}{target.ShortDescription} is DEAD!", deathColor, true);
-                Console.WriteLine($"You gain {target.CurrentExp}EXP and {target.Gold} Gold!");
+                Console.WriteLine($"You gain {target.CurrentExp}EXP and {target.Gold} Gold!{GlobalLineTerminator}");
                 target.CurrentRoom.actorsInRoom.Remove(target);
                 attacker.InCombat = false;
                 attacker.CurrentExp += target.CurrentExp;
@@ -779,7 +784,7 @@ namespace TextAdventure
             int targetDamage = 0;
 
             attackerDamage += RollDice(2, 6);
-
+            Thread.Sleep(100);
             targetDamage += RollDice(2, 6);
 
             Console.WriteLine($"You hit {target.ShortDescription} for {attackerDamage} points of damage!");
@@ -787,6 +792,8 @@ namespace TextAdventure
 
             target.CurrentHP -= attackerDamage;
             attacker.CurrentHP -= targetDamage;
+
+            Game.DisplayPrompt();
         }
     }
 }

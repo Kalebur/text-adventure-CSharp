@@ -38,7 +38,7 @@ namespace TextAdventure
         public bool InCombat { get; set; }
         public bool IsPlayer { get; set; }
         public bool IsAsleep { get; set; }
-        public bool IsConscious { get; set; }
+        public bool IsConscious { get; set; } = true;
         public bool CanWake { get; set; }
 
         // Location, inventory and equipment fields
@@ -175,6 +175,36 @@ namespace TextAdventure
 
         }
 
+        private static Actor CloneActor(Actor actorToClone)
+        {
+            return new Actor()
+            {
+                ID = actorToClone.ID,
+                Name = actorToClone.Name,
+                ShortDescription = actorToClone.ShortDescription,
+                LongDescription = actorToClone.LongDescription,
+                Description = actorToClone.Description,
+                Level = actorToClone.Level,
+                CurrentExp = actorToClone.CurrentExp,
+                CurrentHP = actorToClone.CurrentHP,
+                MaxHP = actorToClone.MaxHP,
+                CurrentMP = actorToClone.CurrentMP,
+                MaxMP = actorToClone.MaxMP,
+                Strength = actorToClone.Strength,
+                Dexterity = actorToClone.Dexterity,
+                Constitution = actorToClone.Constitution,
+                Intelligence = actorToClone.Intelligence,
+                Wisdom = actorToClone.Wisdom,
+                Charisma = actorToClone.Charisma,
+                Gold = actorToClone.Gold,
+            };
+        }
+
+        public static void SpawnActor(Actor actor, Room spawnLocation)
+        {
+            CloneActor(actor).MoveActor(spawnLocation);
+        }
+
         private void DisplayActorInfo()
         {
             Console.WriteLine("****************************************");
@@ -188,7 +218,7 @@ namespace TextAdventure
             Console.WriteLine($"Long Desc: {LongDescription}");
             Console.WriteLine("Description:");
             Console.WriteLine($"{Game.UniversalPadding}{Description}\n");
-            Console.WriteLine($"HP: {CurrentHP}/{MaxHP}  MP: {CurrentMP}/{MaxMP}");
+            Console.WriteLine($"HP: {CurrentHP}/{MaxHP}  MP: {CurrentMP}/{MaxMP} Gold: {Gold}");
             ShowEquipment();
             ShowInventory();
         }

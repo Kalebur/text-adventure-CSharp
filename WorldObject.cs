@@ -120,5 +120,20 @@ namespace TextAdventure
             }
         }
 
+        public virtual WorldObject CloneObject(WorldObject obj)
+        {
+            return new WorldObject()
+            {
+                ID = obj.ID,
+                AreaID = obj.AreaID,
+                Keywords = obj.Keywords,
+                ShortDescription = obj.ShortDescription,
+                LongDescription = obj.LongDescription,
+                Description = obj.Description,
+                Weight = obj.Weight,
+                ObjectFlags = obj.ObjectFlags,
+                WearLocations = obj.WearLocations,
+            };
+        }
     }
 }
