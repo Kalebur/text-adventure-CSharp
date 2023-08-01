@@ -73,6 +73,7 @@ namespace TextAdventure
             {
                 Console.WriteLine($"You take {item.ShortDescription} out of {ShortDescription}.");
                 item.ObjectToActor(receiver);
+                _currentWeight -= item.Weight;
                 ContainedItems.Remove(item);
             }
             else

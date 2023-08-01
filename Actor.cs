@@ -124,6 +124,11 @@ namespace TextAdventure
             room.actorsInRoom.Add(this);
         }
 
+        public void EquipToActor(string itemToEquip)
+        {
+            DoWear(itemToEquip);
+        }
+
         /// <summary>
         /// Shows the list of everything the player currently has equipped.
         /// Empty slots will show up as "Nothing."
@@ -536,6 +541,152 @@ namespace TextAdventure
                     {
                         Console.WriteLine("Unable to find specified actor.");
                     }
+                }
+            }
+        }
+
+        public void DoWear(string args)
+        {
+            if (args == "wear")
+            {
+                if (IsPlayer)
+                {
+                    Console.WriteLine("Wear WHAT?!");
+                }
+                return;
+            }
+            string[] splitArgs = args.Split(" ");
+            int targetIndex = IsCarrying(splitArgs[0]);
+            var obj = Inventory[targetIndex];
+            if (obj != null && obj.WearLocations.Count > 0)
+            {
+                foreach (var loc in obj.WearLocations)
+                {
+                    if (loc.ToString() == "HELD")
+                    {
+                        if (obj.WearLocations.Contains(WorldObject.WearLocation.WIELD_DUAL))
+                        {
+                            if (Equipment[WorldObject.WearLocation.WIELD_R] != null ||
+                                Equipment[WorldObject.WearLocation.WIELD_L] != null)
+                            {
+                                if (!IsPlayer) { return; }
+                                Console.WriteLine("You need both hands free to wield that!");
+                                return;
+                            }
+                        }
+                        if (Equipment[WorldObject.WearLocation.WIELD_R] == null)
+                        {
+                            Equipment[WorldObject.WearLocation.WIELD_R] = obj;
+                            if (IsPlayer)
+                            {
+                                Console.WriteLine($"You wield {obj.ShortDescription} in your right hand.");
+                            }
+                            obj.ObjectFromActor(this);
+                            return;
+                        }
+                        else if (Equipment[WorldObject.WearLocation.WIELD_L] == null)
+                        {
+                            Equipment[WorldObject.WearLocation.WIELD_L] = obj;
+                            if (IsPlayer)
+                            {
+                                Console.WriteLine($"You wield {obj.ShortDescription} in your left hand.");
+                            }
+                            obj.ObjectFromActor(this);
+                            return;
+                        }
+                        else
+                        {
+                            if (IsPlayer)
+                            {
+                                Console.WriteLine("Your hands are too full to hold anything else!");
+                            }
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (Equipment[loc] == null)
+                        {
+                            Equipment[loc] = obj;
+                            obj.ObjectFromActor(this);
+                            if (IsPlayer)
+                            {
+                                Console.WriteLine($"You wear {obj.ShortDescription} on your {loc.ToString().ToLower()}.");
+                            }
+                            return;
+                        }
+                        else if (Equipment[loc] != null && obj.WearLocations.Count == 1)
+                        {
+                            if (IsPlayer)
+                            {
+                                Console.WriteLine($"You're already wearing something on your {loc.ToString().ToLower()}! You might wanna take that off first.");
+                            }
+                            return;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+            else if (obj != null && obj.WearLocations.Count == 0)
+            {
+                if (IsPlayer)
+                {
+                    Console.WriteLine("You can't figure out how to wear that.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("You're not carrying that.");
+            }
+        }
+
+        public void DoMPForce(string args)
+        {
+            string[] splitArgs = args.Split(" ");
+            if (splitArgs.Length < 3 )
+            {
+                Console.WriteLine("Usage: mpforce <target> <command> <commandArgs>");
+                return;
+            } else
+            {
+                // Break up args into target, the command the target is to perform,
+                // and the arguments for said command
+                string target = splitArgs[0];
+                string forceCommand = splitArgs[1];
+                string forceArgs = "";
+                for (int i = 2; i < splitArgs.Length; i++)
+                {
+                    if (i == splitArgs.Length - 1)
+                    {
+                        forceArgs += splitArgs[i];
+                    } else
+                    {
+                        forceArgs += $"{splitArgs[i]} ";
+                    }
+                }
+
+                // Check to see if the target is in the room
+                bool targetHere = false;
+                CurrentRoom.actorsInRoom.ForEach(actor =>
+                {
+                    if (actor.Name.ToLower().Contains(target) ||
+                    actor.ShortDescription.ToLower().Contains(target))
+                    {
+                        Game.ProcessCommand($"{forceCommand} {forceArgs}", actor);
+                        targetHere = true;
+                        return;
+                    }
+                });
+
+                // Inform user that their target isn't in the room if not found
+                if (!targetHere)
+                {
+                    Console.WriteLine("They aren't here.");
+                    return;
+
                 }
             }
         }

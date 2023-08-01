@@ -3,7 +3,7 @@ Filename: area2.txt
 Name: FILE-BASED Area #2
 Description: The second area created entirely using FILE READING! Isn't it AMAZING?!
 Room Count: 6
-Object Count: 4
+Object Count: 5
 Actor Count: 2
 
 **OBJECT_LIST**
@@ -56,6 +56,18 @@ Short Description: a "KISS" t-shirt
 Long Description: A t-shirt for the band "KISS" lies crumpled on the ground.
 Description: A faded black t-shirt with all of the members of the band, "KISS," pictured on the front. The shirt has a number of small holes and tears all over it. The face of one of the band members has been marked out with a black marker.
 Weight: 1
+Wear Locations: TORSO
+Object Flags: "canTake":true
+--END_OBJECT--
+
+--OBJECT--
+Object Type: equipment
+ID: 4
+Keywords: ancient,breast,plate,breastplate
+Short Description: an ancient breastplate
+Long Description: An ancient breastplate worn by soldiers of the Erst army is here.
+Description: This breastplate is barely still holding together. It is rusty, full of holes, and most of the leather straps have long since rotted away. Though nearly worn away, an etching of the Erst kingdom's insignia still remains on the front of the plate.
+Weight: 20
 Wear Locations: TORSO
 Object Flags: "canTake":true
 --END_OBJECT--

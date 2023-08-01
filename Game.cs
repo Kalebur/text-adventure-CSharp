@@ -48,156 +48,98 @@ namespace TextAdventure
         }
 
 
-        public static void ProcessCommand(string command)
+        public static void ProcessCommand(string command, Actor performingActor = null)
         {
             string[] splitCommand = command.ToLower().Split(' ');
             int targetIndex;
             string args = command[(command.IndexOf(' ') + 1)..];
+            if (performingActor == null)
+            {
+                performingActor = Player;
+            }
             switch (splitCommand[0]) {
                 case "quit":
                     QuitGame();
                     break;
 
                 case "look":
-                    Player.DoLook(args.ToLower());
+                    performingActor.DoLook(args.ToLower());
                     break;
 
                 case "ne":
                 case "northeast":
-                    Player.MoveActor("Northeast");
+                    performingActor.MoveActor("Northeast");
                     break;
 
                 case "n":
                 case "north":
-                    Player.MoveActor("North");
+                    performingActor.MoveActor("North");
                     break;
 
                 case "s":
                 case "south":
-                    Player.MoveActor("South");
+                    performingActor.MoveActor("South");
                     break;
 
                 case "se":
                 case "southeast":
-                    Player.MoveActor("Southeast");
+                    performingActor.MoveActor("Southeast");
                     break;
 
                 case "sw":
                 case "southwest":
-                    Player.MoveActor("Southwest");
+                    performingActor.MoveActor("Southwest");
                     break;
 
                 case "e":
                 case "east":
-                    Player.MoveActor("East");
+                    performingActor.MoveActor("East");
                     break;
 
                 case "w":
                 case "west":
-                    Player.MoveActor("West");
+                    performingActor.MoveActor("West");
                     break;
 
                 case "u":
                 case "up":
-                    Player.MoveActor("Up");
+                    performingActor.MoveActor("Up");
                     break;
 
                 case "d":
                 case "down":
-                    Player.MoveActor("Down");
+                    performingActor.MoveActor("Down");
                     break;
 
                 case "astat":
-                    areas[Player.CurrentRoom.AreaID].DisplayArea();
+                    areas[performingActor.CurrentRoom.AreaID].DisplayArea();
                     break;
 
                 case "inv":
                 case "inventory":
                 case "i":
-                    Player.ShowInventory();
+                    performingActor.ShowInventory();
                     break;
 
                 case "eq":
-                    Player.ShowEquipment();
+                    performingActor.ShowEquipment();
                     break;
 
                 case "get":
-                    Player.DoGet(args.ToLower());
+                    performingActor.DoGet(args.ToLower());
                     break;
 
                 case "drop":
-                    Player.DoDrop(args.ToLower());
+                    performingActor.DoDrop(args.ToLower());
                     break;
 
                 case "wear":
-                    if (splitCommand.Length == 1)
-                    {
-                        Console.WriteLine("Wear WHAT?!");
-                        break;
-                    }
-                    targetIndex = Player.IsCarrying(splitCommand[1]);
-                    var obj = Player.Inventory[targetIndex];
-                    if (obj != null && obj.WearLocations.Count > 0)
-                    {
-                        foreach (var loc in obj.WearLocations)
-                        {
-                            if (loc.ToString() == "HELD")
-                            {
-                                if (obj.WearLocations.Contains(WorldObject.WearLocation.WIELD_DUAL))
-                                {
-                                    if (Player.Equipment[WorldObject.WearLocation.WIELD_R] != null ||
-                                        Player.Equipment[WorldObject.WearLocation.WIELD_L] != null) {
-                                        Console.WriteLine("You need both hands free to wield that!");
-                                        return;
-                                    }
-                                }
-                                if (Player.Equipment[WorldObject.WearLocation.WIELD_R] == null)
-                                {
-                                    Player.Equipment[WorldObject.WearLocation.WIELD_R] = obj;
-                                    Console.WriteLine($"You wield {obj.ShortDescription} in your right hand.");
-                                    obj.ObjectFromActor(Player);
-                                    return;
-                                } else if (Player.Equipment[WorldObject.WearLocation.WIELD_L] == null)
-                                {
-                                    Player.Equipment[WorldObject.WearLocation.WIELD_L] = obj;
-                                    Console.WriteLine($"You wield {obj.ShortDescription} in your left hand.");
-                                    obj.ObjectFromActor(Player);
-                                    return;
-                                } else
-                                {
-                                    Console.WriteLine("Your hands are too full to hold anything else!");
-                                    return;
-                                }
-                            } else
-                            {
-                                if (Player.Equipment[loc] == null)
-                                {
-                                    Player.Equipment[loc] = obj;
-                                    obj.ObjectFromActor (Player);
-                                    Console.WriteLine($"You wear {obj.ShortDescription} on your {loc.ToString().ToLower()}.");
-                                    return;
-                                } else if (Player.Equipment[loc] != null && obj.WearLocations.Count == 1)
-                                {
-                                    Console.WriteLine($"You're already wearing something on your {loc.ToString().ToLower()}! You might wanna take that off first.");
-                                    return;
-                                } else
-                                {
-                                    continue;
-                                }
-                            }
-                        }
-                    } else if (obj != null && obj.WearLocations.Count == 0)
-                    {
-                        Console.WriteLine("You can't figure out how to wear that.");
-                    } else
-                    {
-                        Console.WriteLine("You're not carrying that.");
-                    }
+                    performingActor.DoWear(args.ToLower());
                     break;
 
                 case "remove":
                 case "rem":
-                    Player.DoRemove(args.ToLower());
+                    performingActor.DoRemove(args.ToLower());
                     break;
 
                 case "alist":
@@ -210,11 +152,11 @@ namespace TextAdventure
 
                 case "exa":
                 case "examine":
-                    Player.DoExamine(args.ToLower());
+                    performingActor.DoExamine(args.ToLower());
                     break;
 
                 case "say":
-                    Player.DoSay(args);
+                    performingActor.DoSay(args);
                     break;
 
                 case "put":
@@ -226,7 +168,7 @@ namespace TextAdventure
                     {
                         string itemToStore = splitCommand[1];
                         string targetContainer = splitCommand[2];
-                        targetIndex = Player.IsCarrying(itemToStore);
+                        targetIndex = performingActor.IsCarrying(itemToStore);
                         int containerIndex;
                         Container container;
 
@@ -237,12 +179,12 @@ namespace TextAdventure
                         } else if (targetIndex != -1) // If player IS carrying target item
                         {
                             // Check if player is carrying target container
-                            containerIndex = Player.IsCarrying(targetContainer);
+                            containerIndex = performingActor.IsCarrying(targetContainer);
                             if (containerIndex == -1)
                             {
                                 // If player isn't carrying target container, check to see if
                                 // the container is an object in the room
-                                container = (Container)Player.CurrentRoom.ObjectInRoom(targetContainer);
+                                container = (Container)performingActor.CurrentRoom.ObjectInRoom(targetContainer);
                                 if (container == null)
                                 {
                                     Console.WriteLine("There's nothing like that here.");
@@ -253,29 +195,29 @@ namespace TextAdventure
                                     return;
                                 } else
                                 {
-                                    container.ObjectToContainer(Player.Inventory[targetIndex]);
+                                    container.ObjectToContainer(performingActor.Inventory[targetIndex]);
                                 }
                             } 
 
                             else
                             {
-                                // Player is carrying both target item and target container
+                                // performingActor is carrying both target item and target container
                                 if (itemToStore == targetContainer)
                                 {
                                     // Prevent player from putting a container inside itself.
                                     Console.WriteLine("You can't put containers in themselves! Are you TRYING to destroy the universe?!");
                                     return;
                                 }
-                                else if (!(Player.Inventory[containerIndex] is Container))
+                                else if (!(performingActor.Inventory[containerIndex] is Container))
                                 {
                                     Console.WriteLine("That's not a container.");
                                     return;
                                 }
                                 {
-                                    // Player has both items and isn't trying to create a paradox
+                                    // performingActor has both items and isn't trying to create a paradox
                                     // Store item in container and stored item from player's inventory
-                                    container = (Container)Player.Inventory[containerIndex];
-                                    container.ObjectToContainer(Player.Inventory[targetIndex]);
+                                    container = (Container)performingActor.Inventory[containerIndex];
+                                    container.ObjectToContainer(performingActor.Inventory[targetIndex]);
                                 }
                             }
                         }
@@ -283,17 +225,21 @@ namespace TextAdventure
                     break;
 
                 case "oinvoke":
-                    SpawnObject(Player, args.ToLower());
+                    SpawnObject(performingActor, args.ToLower());
                     break;
 
                 case "kill":
                 case "attack":
                 case "k":
-                    Player.DoKill(args.ToLower());
+                    performingActor.DoKill(args.ToLower());
                     break;
 
                 case "mstat":
-                    Player.DoMstat(args.ToLower());
+                    performingActor.DoMstat(args.ToLower());
+                    break;
+
+                case "mpforce":
+                    performingActor.DoMPForce(args.ToLower());
                     break;
 
                 default:
