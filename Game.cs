@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Common;
 using System.Linq;
 using System.Numerics;
@@ -280,12 +281,12 @@ namespace TextAdventure
             string? userInput;
             Player.CurrentRoom.DisplayRoom();
 
-            while (Game.isPlaying)
+            while (isPlaying)
             {
                 DisplayPrompt();
                 userInput = Console.ReadLine();
 #pragma warning disable CS8604 // Possible null reference argument.
-                Game.ProcessCommand(userInput);
+                ProcessCommand(userInput);
 #pragma warning restore CS8604 // Possible null reference argument.
             }
         }
@@ -321,7 +322,9 @@ namespace TextAdventure
         {
             int stopIndex = data.IndexOf(terminator);
             int dataLength = stopIndex - identifier.Length;
-            return data.Substring(identifier.Length, dataLength).Trim();
+            string parsedValue = data.Substring(identifier.Length, dataLength).Trim();
+            TrimCurrentLine(ref data);
+            return parsedValue;
         }
 
         public static int ParseID(ref string areaData)
@@ -545,16 +548,39 @@ namespace TextAdventure
                     Container container = ParseContainer(obj, ref currentObject, terminator);
                     area.Objects[container.ID] = container;
                     container.ObjectToRoom(area.Rooms[0]);
-                    area.Objects[container.ID] = container;
-                } else
+                } else if (objectType == "furniture")
+                {
+                    Furniture furniture = ParseFurniture(obj, ref currentObject, terminator);
+                    area.Objects[furniture.ID] = furniture;
+                    furniture.ObjectToRoom(area.Rooms[0]);
+                }
                 {
                     area.Objects[obj.ID] = obj;
-
                 }
 
                 objectData = objectData.Substring(endIndex);
 
             }
+        }
+
+        public static Furniture ParseFurniture(WorldObject obj, ref string objectData, string terminator)
+        {
+            Furniture furniture = new Furniture();
+            furniture.ID = obj.ID;
+            furniture.Keywords = obj.Keywords;
+            furniture.ShortDescription = obj.ShortDescription;
+            furniture.LongDescription = obj.LongDescription;
+            furniture.Description = obj.Description;
+            furniture.WearLocations = obj.WearLocations;
+            furniture.ObjectFlags = obj.ObjectFlags;
+            furniture.Weight = obj.Weight;
+            furniture.MaxOccupants = int.Parse(ParseValue(ref objectData, "Max Occupants: ", terminator));
+            furniture.InteractMsg = ParseValue(ref objectData, "Interact Msg: ", terminator);
+            furniture.WeightCapacity = float.Parse(ParseValue(ref objectData, "Weight Capacity: ", terminator));
+
+
+            return furniture;
+
         }
 
         public static void ParseAreaFile(string areaFile)

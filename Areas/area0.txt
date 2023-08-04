@@ -3,7 +3,7 @@ Filename: area2.txt
 Name: FILE-BASED Area #2
 Description: The second area created entirely using FILE READING! Isn't it AMAZING?!
 Room Count: 6
-Object Count: 5
+Object Count: 6
 Actor Count: 2
 
 **OBJECT_LIST**
@@ -70,6 +70,21 @@ Description: This breastplate is barely still holding together. It is rusty, ful
 Weight: 20
 Wear Locations: TORSO
 Object Flags: "canTake":true
+--END_OBJECT--
+
+--OBJECT--
+Object Type: furniture
+ID: 5
+Keywords: plush,bed
+Short Description: a luxurious, plush, bed
+Long Description: A luxurious, plush, bed is here.
+Description: The bed is big enough to fit a half dozen average sized people easily. The sheets are made of the finest silks, and the mattress and pillows are so soft enough to sink into.
+Weight: 100
+Wear Locations: 
+Object Flags: "canTake":false
+Max Occupants: 6
+Interact Msg: on
+Weight Capacity: 1500
 --END_OBJECT--
 **END_OBJECT_LIST**
 
