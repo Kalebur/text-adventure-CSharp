@@ -11,7 +11,7 @@ namespace TextAdventure
     // Class used to create anything that moves, fights, speaks, etc.
     internal class Actor
     {
-        public enum Position { STANDING, STANDING_OBJECT, SLEEPING, SITTING, LYING, UNCONSCIOUS }
+        public enum Position { STANDING, STANDING_OBJECT, SITTING, LYING, SLEEPING, UNCONSCIOUS }
         public int ID { get; set; }
 
         public string Name { get; set; }
@@ -105,6 +105,17 @@ namespace TextAdventure
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("You're too busy FIGHTING!");
                 Console.ForegroundColor = ConsoleColor.Gray;
+                return;
+            } else if (OnFurniture != null)
+            {
+                Console.WriteLine($"You might want to {OnFurniture.ExitMsg} {OnFurniture.ShortDescription} first!");
+                return;
+            } else if (CurrentPosition == Position.SLEEPING) {
+                Console.WriteLine("You're asleep!");
+                return;
+            } else if (CurrentPosition != Position.STANDING)
+            {
+                Console.WriteLine("You might want to stand up first!");
                 return;
             }
 
@@ -713,8 +724,10 @@ namespace TextAdventure
                 } else if (args == "stand" && CurrentPosition != Position.STANDING)
                 {
                     // Is person already standing on something?
-                    if (CurrentPosition == Position.STANDING_OBJECT) {
+                    if (CurrentPosition == Position.STANDING_OBJECT ||
+                        OnFurniture != null) {
                         Console.WriteLine($"You {OnFurniture.ExitMsg} {OnFurniture.ShortDescription}.");
+                        CurrentPosition = Position.STANDING;
                         OnFurniture.Occupants.Remove(this);
                         OnFurniture = null;
                         return;
@@ -729,44 +742,162 @@ namespace TextAdventure
                     // Player is trying to stand on something
                     // Check to see if a matching object is in the room
                     var targetObj = CurrentRoom.ObjectInRoom(args);
+
+                    // A matching object has been found, but is it
+                    // a type of furniture?
+                    if (targetObj != null && targetObj is Furniture)
                     {
-                        // A matching object has been found, but is it
-                        // a type of furniture?
-                        if (targetObj != null && targetObj is Furniture)
-                        {
-                            Furniture furniture = (Furniture)targetObj;
-                            // Object is furniture! Does it have room for another person?
-                            if (furniture.Occupants.Count + 1 < furniture.MaxOccupants) 
-                            {
-                                // Object has room, but is the person trying to stand on something
-                                // they're already standing on?
-                                if (furniture.Occupants.Contains(this))
-                                {
-                                    Console.WriteLine($"You're already standing {furniture.EnterMsg} that!");
-                                    return;
-                                } else
-                                {
-                                    // Everything clears and person can stand on object!
-                                    Console.WriteLine($"You stand {furniture.EnterMsg} {targetObj.ShortDescription}.");
-                                    furniture.Occupants.Add(this);
-                                    CurrentPosition = Position.STANDING_OBJECT;
-                                    OnFurniture = furniture;
-                                    return;
-                                }
-                            } else
-                            {
-                                // Object doesn't have room for anyone else
-                                Console.WriteLine($"There isn't anymore room {furniture.EnterMsg} {furniture.ShortDescription}!");
-                                return;
-                            }
-                        } else
-                        {
-                            // Object isn't furniture of any sort
-                            Console.WriteLine("You make a fool of yourself trying to stand on that!");
-                            return;
-                        }
+                        Furniture furniture = (Furniture)targetObj;
+                        furniture.ActorToFurniture(this, "stand");
+                    } else if (targetObj != WorldObject.nullObject)
+                    {
+                        // Object isn't furniture of any sort
+                        Console.WriteLine("You make a fool of yourself trying to stand on that!");
+                        return;
                     }
                 }
+            }
+        }
+
+        public void DoSit(string args)
+        {
+            if (IsAsleep)
+            {
+                Console.WriteLine("You're asleep!");
+                return;
+            } else
+            {
+                if (args == "sit" && CurrentPosition != Position.SITTING)
+                {
+                    Console.WriteLine("You sit down.");
+                    CurrentPosition = Position.SITTING;
+                    return;
+                } else if (args == "sit" && CurrentPosition == Position.SITTING)
+                {
+                    Console.WriteLine("You're already sitting!");
+                    return;
+                } else
+                {
+                    var targetObj = CurrentRoom.ObjectInRoom(args);
+
+                    // A matching object has been found, but is it
+                    // a type of furniture?
+                    if (targetObj != null && targetObj is Furniture)
+                    {
+                        Furniture furniture = (Furniture)targetObj;
+                        furniture.ActorToFurniture(this, "sit");
+                    }
+                    else if (targetObj != WorldObject.nullObject)
+                    {
+                        // Object isn't furniture of any sort
+                        Console.WriteLine("It's probably best not to sit on that.");
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void DoLie(string args)
+        {
+            if (IsAsleep)
+            {
+                Console.WriteLine("You're asleep!");
+                return;
+            }
+            else
+            {
+                if (args == "lie" && CurrentPosition != Position.LYING)
+                {
+                    Console.WriteLine("You lie down.");
+                    CurrentPosition = Position.LYING;
+                    return;
+                }
+                else if (args == "lie" && CurrentPosition == Position.LYING)
+                {
+                    Console.WriteLine("You're already lying down!");
+                    return;
+                }
+                else
+                {
+                    var targetObj = CurrentRoom.ObjectInRoom(args);
+
+                    // A matching object has been found, but is it
+                    // a type of furniture?
+                    if (targetObj != null && targetObj is Furniture)
+                    {
+                        Furniture furniture = (Furniture)targetObj;
+                        furniture.ActorToFurniture(this, "lie");
+                    }
+                    else if (targetObj != WorldObject.nullObject)
+                    {
+                        // Object isn't furniture of any sort
+                        Console.WriteLine("It's probably best not to lie on that.");
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void DoSleep(string args)
+        {
+            if (IsAsleep)
+            {
+                Console.WriteLine("You're already sleeping!");
+                return;
+            }
+            else
+            {
+                if (args == "sleep" && CurrentPosition < Position.SITTING)
+                {
+                    Console.WriteLine("It's not healthy to pass out on your feet!");
+                    return;
+                }
+                else if (args == "sleep" && CurrentPosition == Position.SITTING)
+                {
+                    Console.WriteLine("You lie back and go to sleep.");
+                    CurrentPosition = Position.SLEEPING;
+                    return;
+                } else if (args == "sleep" && CurrentPosition == Position.LYING)
+                {
+                    Console.WriteLine("You close your eyes and drift off to sleep.");
+                    CurrentPosition = Position.SLEEPING;
+                    return;
+                }
+                else
+                {
+                    var targetObj = CurrentRoom.ObjectInRoom(args);
+
+                    // A matching object has been found, but is it
+                    // a type of furniture?
+                    if (targetObj != null && targetObj is Furniture)
+                    {
+                        Furniture furniture = (Furniture)targetObj;
+                        furniture.ActorToFurniture(this, "sleep");
+                    }
+                    else if (targetObj != WorldObject.nullObject)
+                    {
+                        // Object isn't furniture of any sort
+                        Console.WriteLine("It's probably best not to sleep on that.");
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void DoWake()
+        {
+            if (CurrentPosition == Position.SLEEPING && CanWake) {
+                Console.WriteLine("You open your eyes and wake up.");
+                CurrentPosition = Position.LYING;
+                return;
+            } else if (CurrentPosition < Position.SLEEPING)
+            {
+                Console.WriteLine("You're already awake!");
+                return;
+            } else
+            {
+                Console.WriteLine("Try as you might, you aren't able to wake up right now.");
+                return;
             }
         }
     }

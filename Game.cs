@@ -247,6 +247,22 @@ namespace TextAdventure
                     performingActor.DoStand(args.ToLower());
                     break;
 
+                case "sit":
+                    performingActor.DoSit(args.ToLower());
+                    break;
+
+                case "lie":
+                    performingActor.DoLie(args.ToLower());
+                    break;
+
+                case "sleep":
+                    performingActor.DoSleep(args.ToLower());
+                    break;
+
+                case "wake":
+                    performingActor.DoWake();
+                    break;
+
                 default:
                     Console.WriteLine("WHAT?!");
                     break;
