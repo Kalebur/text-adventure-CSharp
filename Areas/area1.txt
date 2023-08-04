@@ -18,7 +18,8 @@ Weight: 50
 Wear Locations: BACK
 Object Flags: "canTake":false
 Max Occupants: 4
-Interact Msg: at
+Enter Msg: at
+Exit Msg: stand up from
 Weight Capacity: 2000
 --END_OBJECT--
 

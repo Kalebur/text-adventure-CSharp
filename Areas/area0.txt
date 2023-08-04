@@ -16,7 +16,7 @@ Long Description: A huge teddy bear is lying on the ground.
 Description: A huge teddy bear with big, brown eyes. There is a zipper on its back, and the stuffing has been removed.
 Weight: 5
 Wear Locations: HELD
-Object Flags: "canTake":false,"isClosable":true,"isClosed":false,"isLockable":false,"isLocked":false
+Object Flags: "canTake":true,"isClosable":true,"isClosed":false,"isLockable":false,"isLocked":false
 Max Weight: 20
 Is Closable: true
 Is Closed: false
@@ -83,7 +83,8 @@ Weight: 100
 Wear Locations: 
 Object Flags: "canTake":false
 Max Occupants: 6
-Interact Msg: on
+Enter Msg: on
+Exit Msg: get off of
 Weight Capacity: 1500
 --END_OBJECT--
 **END_OBJECT_LIST**

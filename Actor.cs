@@ -11,6 +11,7 @@ namespace TextAdventure
     // Class used to create anything that moves, fights, speaks, etc.
     internal class Actor
     {
+        public enum Position { STANDING, STANDING_OBJECT, SLEEPING, SITTING, LYING, UNCONSCIOUS }
         public int ID { get; set; }
 
         public string Name { get; set; }
@@ -33,13 +34,15 @@ namespace TextAdventure
         public int Wisdom { get; set; }
         public int Charisma { get; set; }
         public int Gold { get; set; }
+        public float Weight { get; set; }
 
         // Battle / status effect flags
         public bool InCombat { get; set; }
         public bool IsPlayer { get; set; }
         public bool IsAsleep { get; set; }
-        public bool IsConscious { get; set; } = true;
+        public Position CurrentPosition { get; set; }
         public bool CanWake { get; set; }
+        public Furniture? OnFurniture { get; set; }
 
         // Location, inventory and equipment fields
         public Room CurrentRoom { get; set; }
@@ -67,10 +70,14 @@ namespace TextAdventure
             Wisdom = 10;
             Charisma = 10;
             Gold = 0;
+            Weight = 100;
             InCombat = false;
             CurrentRoom = Room.nullRoom;
             IsPlayer = false;
             ID = 0;
+            CanWake = true;
+            CurrentPosition = Position.STANDING;
+            OnFurniture = null;
             Equipment.Add(WorldObject.WearLocation.HEAD, null);
             Equipment.Add(WorldObject.WearLocation.EARS, null);
             Equipment.Add(WorldObject.WearLocation.NECK, null);
@@ -687,6 +694,78 @@ namespace TextAdventure
                     Console.WriteLine("They aren't here.");
                     return;
 
+                }
+            }
+        }
+
+        public void DoStand(string args)
+        {
+            if (IsAsleep)
+            {
+                Console.WriteLine("You're asleep!");
+                return;
+            } else
+            {
+                if (args == "stand" && CurrentPosition == Position.STANDING)
+                {
+                    Console.WriteLine("You're already standing!");
+                    return;
+                } else if (args == "stand" && CurrentPosition != Position.STANDING)
+                {
+                    // Is person already standing on something?
+                    if (CurrentPosition == Position.STANDING_OBJECT) {
+                        Console.WriteLine($"You {OnFurniture.ExitMsg} {OnFurniture.ShortDescription}.");
+                        OnFurniture.Occupants.Remove(this);
+                        OnFurniture = null;
+                        return;
+                    } else
+                    {
+                        Console.WriteLine("You stand up.");
+                        CurrentPosition = Position.STANDING;
+                        return;
+                    }
+                } else
+                {
+                    // Player is trying to stand on something
+                    // Check to see if a matching object is in the room
+                    var targetObj = CurrentRoom.ObjectInRoom(args);
+                    {
+                        // A matching object has been found, but is it
+                        // a type of furniture?
+                        if (targetObj != null && targetObj is Furniture)
+                        {
+                            Furniture furniture = (Furniture)targetObj;
+                            // Object is furniture! Does it have room for another person?
+                            if (furniture.Occupants.Count + 1 < furniture.MaxOccupants) 
+                            {
+                                // Object has room, but is the person trying to stand on something
+                                // they're already standing on?
+                                if (furniture.Occupants.Contains(this))
+                                {
+                                    Console.WriteLine($"You're already standing {furniture.EnterMsg} that!");
+                                    return;
+                                } else
+                                {
+                                    // Everything clears and person can stand on object!
+                                    Console.WriteLine($"You stand {furniture.EnterMsg} {targetObj.ShortDescription}.");
+                                    furniture.Occupants.Add(this);
+                                    CurrentPosition = Position.STANDING_OBJECT;
+                                    OnFurniture = furniture;
+                                    return;
+                                }
+                            } else
+                            {
+                                // Object doesn't have room for anyone else
+                                Console.WriteLine($"There isn't anymore room {furniture.EnterMsg} {furniture.ShortDescription}!");
+                                return;
+                            }
+                        } else
+                        {
+                            // Object isn't furniture of any sort
+                            Console.WriteLine("You make a fool of yourself trying to stand on that!");
+                            return;
+                        }
+                    }
                 }
             }
         }

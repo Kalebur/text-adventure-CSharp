@@ -243,6 +243,10 @@ namespace TextAdventure
                     performingActor.DoMPForce(args.ToLower());
                     break;
 
+                case "stand":
+                    performingActor.DoStand(args.ToLower());
+                    break;
+
                 default:
                     Console.WriteLine("WHAT?!");
                     break;
@@ -539,7 +543,8 @@ namespace TextAdventure
             furniture.ObjectFlags = obj.ObjectFlags;
             furniture.Weight = obj.Weight;
             furniture.MaxOccupants = int.Parse(ParseValue(ref objectData, "Max Occupants: ", terminator));
-            furniture.InteractMsg = ParseValue(ref objectData, "Interact Msg: ", terminator);
+            furniture.EnterMsg = ParseValue(ref objectData, "Enter Msg: ", terminator);
+            furniture.ExitMsg = ParseValue(ref objectData, "Exit Msg: ", terminator);
             furniture.WeightCapacity = float.Parse(ParseValue(ref objectData, "Weight Capacity: ", terminator));
 
 
