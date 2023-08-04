@@ -49,7 +49,7 @@ namespace TextAdventure
         }
 
 
-        public static void ProcessCommand(string command, Actor performingActor = null)
+        public static void ProcessCommand(string command, Actor? performingActor = null)
         {
             string[] splitCommand = command.ToLower().Split(' ');
             int targetIndex;
@@ -330,7 +330,6 @@ namespace TextAdventure
         public static int ParseID(ref string areaData)
         {
             _ = int.TryParse(ParseValue(ref areaData, "ID: ", "\n"), out int id);
-            areaData = areaData[(areaData.IndexOf("\n") + 1)..];
             return id;
         }
 
@@ -344,7 +343,7 @@ namespace TextAdventure
             return ParseValue(ref data, "Name: ", "\n");
         }
 
-        public static int ParseEntityCount(string data, string entity)
+        public static int ParseEntityCount(ref string data, string entity)
         {
             _ = int.TryParse(ParseValue(ref data, entity + " Count: ", "\n"), out int count);
             return count;
@@ -369,9 +368,7 @@ namespace TextAdventure
 
             int roomID = ParseID(ref roomData);
             string roomName = ParseName(ref roomData);
-            roomData = roomData.Substring(roomData.IndexOf("\n") + 1);
             string roomDescription = ParseDescription(ref roomData);
-            roomData = roomData.Substring(roomData.IndexOf("\n") + 1);
             ParseExits(area.Rooms[roomID], roomData);
             areaData = areaData.Substring(areaData.IndexOf(terminator) + (terminator.Length + 2));
 
@@ -392,39 +389,24 @@ namespace TextAdventure
                 Actor actor = new Actor();
                 actor.ID = ParseID(ref currentActor);
                 actor.Name = ParseValue(ref currentActor, "Name: ", GlobalLineTerminator);
-                TrimCurrentLine(ref currentActor);
                 actor.ShortDescription = ParseValue(ref currentActor, "Short Description: ", GlobalLineTerminator);
-                TrimCurrentLine(ref currentActor);
                 actor.LongDescription = ParseValue(ref currentActor, "Long Description: ", GlobalLineTerminator);
-                TrimCurrentLine(ref currentActor);
                 actor.Description = ParseValue(ref currentActor, "Description: ", GlobalLineTerminator);
-                TrimCurrentLine(ref currentActor);
                 actor.Level = int.Parse(ParseValue(ref currentActor, "Level: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 actor.CurrentExp = int.Parse(ParseValue(ref currentActor, "Current Exp: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 int HP = int.Parse(ParseValue(ref currentActor, "Max HP: ", GlobalLineTerminator));
                 actor.CurrentHP = HP;
                 actor.MaxHP = HP;
-                TrimCurrentLine(ref currentActor);
                 int MP = int.Parse(ParseValue(ref currentActor, "Max MP: ", GlobalLineTerminator));
                 actor.CurrentMP = MP;
                 actor.MaxMP = MP;
-                TrimCurrentLine(ref currentActor);
                 actor.Strength = int.Parse(ParseValue(ref currentActor, "Strength: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 actor.Dexterity = int.Parse(ParseValue(ref currentActor, "Dexterity: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 actor.Constitution = int.Parse(ParseValue(ref currentActor, "Constitution: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 actor.Intelligence = int.Parse(ParseValue(ref currentActor, "Intelligence: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 actor.Wisdom = int.Parse(ParseValue(ref currentActor, "Wisdom: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 actor.Charisma = int.Parse(ParseValue(ref currentActor, "Charisma: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 actor.Gold = int.Parse(ParseValue(ref currentActor, "Gold: ", GlobalLineTerminator));
-                TrimCurrentLine(ref currentActor);
                 area.Actors[actor.ID] = actor;
                 Actor.SpawnActor(actor, areas[area.ID].Rooms[1]);
 
@@ -441,11 +423,8 @@ namespace TextAdventure
                 roomData = roomData.Substring(roomData.IndexOf("--EXIT--"));
                 roomData = roomData.Substring(roomData.IndexOf(terminator) +  1);
                 string exitDirection = ParseValue(ref roomData, "Direction: ", terminator).Trim();
-                roomData = roomData.Substring(roomData.IndexOf(terminator) + 1);
                 int areaID = int.Parse(ParseValue(ref roomData, "Connected Area ID: ", terminator));
-                roomData = roomData.Substring(roomData.IndexOf(terminator) + 1);
                 int roomID = int.Parse(ParseValue(ref roomData, "Connected Room ID: ", terminator));
-                roomData = roomData.Substring(roomData.IndexOf(terminator) + 1);
                 if (roomData.IndexOf("Custom Name") != -1)
                 {
                     customName = ParseValue(ref roomData, "Custom Name: ", terminator).Trim();
@@ -460,16 +439,11 @@ namespace TextAdventure
             WorldObject obj = new WorldObject();
             int id = ParseID(ref objectData);
             string[] keywords = ParseValue(ref objectData, "Keywords: ", terminator).Split(',');
-            TrimCurrentLine(ref objectData);
             obj.Keywords = keywords;
             string shortDescription = ParseValue(ref objectData, "Short Description: ", terminator);
-            TrimCurrentLine(ref objectData);
             string longDescription = ParseValue(ref objectData, "Long Description: ", terminator);
-            TrimCurrentLine(ref objectData);
             string description = ParseValue(ref objectData, "Description: ", terminator);
-            TrimCurrentLine(ref objectData);
             float weight = float.Parse(ParseValue(ref objectData, "Weight: ", terminator));
-            TrimCurrentLine(ref objectData);
 
             obj.ID = id;
             obj.ShortDescription = shortDescription;
@@ -491,16 +465,10 @@ namespace TextAdventure
             container.ObjectFlags = obj.ObjectFlags;
             container.Weight = obj.Weight;
             container.MaxWeight = float.Parse(ParseValue(ref objectData, "Max Weight: ", terminator));
-            TrimCurrentLine(ref objectData);
             container.IsClosable = bool.Parse(ParseValue(ref objectData, "Is Closable: ", terminator));
-            TrimCurrentLine(ref objectData);
             container.IsClosed = bool.Parse(ParseValue(ref objectData, "Is Closed: ", terminator));
-            TrimCurrentLine(ref objectData);
             container.IsLockable = bool.Parse(ParseValue(ref objectData, "Is Lockable: ", terminator));
-            TrimCurrentLine(ref objectData);
             container.IsLocked = bool.Parse(ParseValue(ref objectData, "Is Locked: ", terminator));
-            TrimCurrentLine(ref objectData);
-
 
             return container;
         }
@@ -519,7 +487,6 @@ namespace TextAdventure
                 string currentObject = objectData.Substring(startIndex, endIndex - startIndex);
                 TrimCurrentLine(ref currentObject);
                 string objectType = ParseValue(ref currentObject, "Object Type: ", terminator);
-                TrimCurrentLine(ref currentObject);
 
                 WorldObject obj = ParseStandardObject(ref currentObject, terminator);
                 // Set object to be wearable on the assigned locations
@@ -538,11 +505,8 @@ namespace TextAdventure
                         }
                     }
                 }
-                TrimCurrentLine(ref currentObject);
                 string[] objectFlags = ParseValue(ref currentObject, "Object Flags: ", terminator).Split(',');
                 ParseObjectFlags(obj, objectFlags);
-                TrimCurrentLine(ref currentObject);
-
                 if (objectType == "container")
                 {
                     Container container = ParseContainer(obj, ref currentObject, terminator);
@@ -599,17 +563,16 @@ namespace TextAdventure
             Game.areas.Add(area);
             area.ID = ParseID(ref areaData);
             area.Filename = ParseValue(ref areaData, "Filename: ", "\n");
-            TrimCurrentLine(ref areaData);
             area.Name = ParseName(ref areaData);
-            areaData = Area.TrimAreaData(areaData, "\n");
+            //areaData = Area.TrimAreaData(areaData, "\n");
             area.Description = ParseDescription(ref areaData);
-            areaData = Area.TrimAreaData(areaData, "\n");
-            area.RoomCount = ParseEntityCount(areaData, "Room");
-            areaData = Area.TrimAreaData(areaData, "\n");
-            area.ObjectCount = ParseEntityCount(areaData, "Object");
-            areaData = Area.TrimAreaData(areaData, "\n");
-            area.ActorCount = ParseEntityCount(areaData, "Actor");
-            areaData = Area.TrimAreaData(areaData, "\n");
+            //areaData = Area.TrimAreaData(areaData, "\n");
+            area.RoomCount = ParseEntityCount(ref areaData, "Room");
+            //areaData = Area.TrimAreaData(areaData, "\n");
+            area.ObjectCount = ParseEntityCount(ref areaData, "Object");
+            //areaData = Area.TrimAreaData(areaData, "\n");
+            area.ActorCount = ParseEntityCount(ref areaData, "Actor");
+            //areaData = Area.TrimAreaData(areaData, "\n");
             area.InitializeEntities();
         }
 
@@ -664,7 +627,10 @@ namespace TextAdventure
                 string[] flagData= flag.Split(':');
                 string keyVal = flagData[0].Substring(1, flagData[0].Length - 2);
                 _ = bool.TryParse(flagData[1], out bool flagValue);
-                obj.ObjectFlags.TryAdd(keyVal, flagValue);
+                if (!obj.ObjectFlags.TryAdd(keyVal, flagValue))
+                {
+                    obj.ObjectFlags[keyVal] = flagValue;
+                }
             }
         }
 

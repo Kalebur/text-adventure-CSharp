@@ -17,6 +17,9 @@ Description: Dude! Tables are EVERYWHERE! This ROCKS!
 Weight: 50
 Wear Locations: BACK
 Object Flags: "canTake":false
+Max Occupants: 4
+Interact Msg: at
+Weight Capacity: 2000
 --END_OBJECT--
 
 --OBJECT--

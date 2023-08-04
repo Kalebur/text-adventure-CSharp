@@ -17,6 +17,9 @@ Description: A huge, plush bed.
 Weight: 100
 Wear Locations: BACK,WAIST
 Object Flags: "canTake":false
+Max Occupants: 5
+Interact Msg: on
+Weight Capacity: 2000
 --END_OBJECT--
 **END_OBJECT_LIST**
 
