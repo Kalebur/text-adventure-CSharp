@@ -465,18 +465,24 @@ namespace TextAdventure
             }
             else
             {
-                foreach (var wornItem in Equipment)
+                var equippedItemsQuery =
+                    from item in Equipment
+                    where item.Value != null && (item.Value.ShortDescription.Contains(args) || item.Value.Keywords.Contains(args))
+                    select item;
+
+                if (equippedItemsQuery.Count() == 0)
                 {
-                    if (wornItem.Value != null &&
-                        (wornItem.Value.Keywords.Contains(args) || wornItem.Value.ShortDescription.Contains(args)))
-                    {
-                        wornItem.Value.ObjectToActor(this);
-                        Equipment[wornItem.Key] = null;
-                        Console.WriteLine($"You remove {wornItem.Value.ShortDescription}.");
-                        return;
-                    }
+                    Console.WriteLine("You're not wearing that.");
+                    return;
                 }
-                Console.WriteLine("You're not wearing that.");
+                else
+                {
+                    var wornItem = equippedItemsQuery.ElementAt(0);
+                    wornItem.Value.ObjectToActor(this);
+                    Equipment[wornItem.Key] = null;
+                    Console.WriteLine($"You remove {wornItem.Value.ShortDescription}.");
+                    return;
+                }
             }
         }
 
